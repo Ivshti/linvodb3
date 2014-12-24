@@ -5,6 +5,7 @@ var should = require('chai').should()
   , path = require('path')
   , _ = require('lodash')
   , async = require('async')
+  , rimraf = require('rimraf')
   , model = require('../lib/document')
   , Datastore = require('../lib/datastore')
   , Cursor = require('../lib/cursor')
@@ -15,11 +16,14 @@ describe('Cursor', function () {
   var d;
 
   beforeEach(function (done) {
-    d = new Datastore({ filename: testDb });
-    d.filename.should.equal(testDb);
-
     async.waterfall([
      function (cb) {
+        rimraf(testDb, cb);
+     },
+     function (cb) {
+        d = new Datastore({ filename: testDb });
+        d.filename.should.equal(testDb);
+
         d.loadDatabase(function (err) {
           assert.isNull(err);
           d.getAllData().length.should.equal(0);

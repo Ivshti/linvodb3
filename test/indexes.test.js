@@ -697,6 +697,7 @@ describe('Indexes', function () {
       idx.getMatching('bloup').length.should.equal(0);
     });
 
+    /* OBSOLETE FUNCTIONALITY
     it('Can reset an index and initialize it with one document', function () {
       var idx = new Index({ fieldName: 'tf' })
         , doc1 = { a: 5, tf: 'hello' }
@@ -747,7 +748,7 @@ describe('Indexes', function () {
       idx.getMatching('new')[0].a.should.equal(555);
       idx.getMatching('again')[0].a.should.equal(666);
     });
-
+    */
   });   // ==== End of 'Resetting' ==== //
 
   it('Get all elements in the index', function () {
