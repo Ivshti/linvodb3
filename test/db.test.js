@@ -28,16 +28,6 @@ describe('Database', function () {
     ], done);
   });
 
-  it('Constructor compatibility with v0.6-', function () {
-    var dbef = new Datastore('somefile');
-    dbef.filename.should.equal('somefile');
-
-    var dbef = new Datastore('');
-    assert.isNull(dbef.filename);
-
-    var dbef = new Datastore();
-    assert.isNull(dbef.filename);
-  });
   /*
   describe('Autoloading', function () {
   
