@@ -1,29 +1,31 @@
 {
-  "name": "nedb",
-  "version": "1.0.1",
+  "name": "linvodb3",
+  "version": "3.0.0",
   "author": {
-    "name": "Louis Chatriot",
-    "email": "louis.chatriot@gmail.com"
+    "name": "Ivo Georgiev",
+    "email": "ivo@linvo.com"
   },
   "contributors": [
-    "Louis Chatriot"
+    "Louis Chatriot",
+    "Ivo Georgiev"
   ],
-  "description": "File-based embedded data store for node.js",
+  "description": "Model-oriented embedded database with a Mongoose-like API over LevelUP",
   "keywords": [
     "database",
     "datastore",
-    "embedded"
+    "embedded",
+    "levelup",
+    "mongoose"
   ],
-  "homepage": "https://github.com/louischatriot/nedb",
+  "homepage": "https://github.com/Ivshti/linvodb3",
   "repository": {
     "type": "git",
-    "url": "git@github.com:louischatriot/nedb.git"
+    "url": "git@github.com:Ivshti/linvodb3.git"
   },
   "dependencies": {
     "async": "0.2.10",
     "lodash": "2.4.x",
-    "binary-search-tree": "0.2.4",
-    "mkdirp": "~0.3.5"
+    "binary-search-tree": "0.2.4"
   },
   "devDependencies": {
     "chai": "1.0.x",
