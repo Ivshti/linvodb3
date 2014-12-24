@@ -1,4 +1,4 @@
-var model = require('../lib/model')
+var model = require('../lib/document')
   , should = require('chai').should()
   , assert = require('chai').assert
   , _ = require('underscore')

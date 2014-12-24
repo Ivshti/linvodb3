@@ -4,7 +4,7 @@ var Index = require('../lib/indexes')
   , assert = require('chai').assert
   , _ = require('underscore')
   , async = require('async')
-  , model = require('../lib/model')
+  , model = require('../lib/document')
   ;
 
 describe('Indexes', function () {
