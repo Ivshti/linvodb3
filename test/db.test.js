@@ -1,6 +1,6 @@
 var should = require('chai').should()
   , assert = require('chai').assert
-  , testDb = 'workspace/test.db'
+  , testDb = 'workspace/test2.db'
   , fs = require('fs')
   , path = require('path')
   , _ = require('underscore')
@@ -287,6 +287,8 @@ describe('Database', function () {
         }
       
         ex.should.equal('SOME EXCEPTION');
+        process.removeListener('uncaughtException', MINE);
+
         done();
       });
 
@@ -316,6 +318,7 @@ describe('Database', function () {
         }
       
         ex.should.equal('SOME EXCEPTION');
+        process.removeListener('uncaughtException', MINE);        
         done();
       });
 
