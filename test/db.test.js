@@ -16,9 +16,13 @@ describe('Database', function () {
 
   beforeEach(function (done) {
     async.waterfall([
-      function (cb) {
-        rimraf(testDb, cb);
-      },
+       function (cb) {
+        if (! d) return cb();
+        d.store.close(cb);
+       },
+       function (cb) {
+          rimraf(testDb, cb);
+       },
       function (cb) {
         d = new Datastore({ filename: testDb });
         d.filename.should.equal(testDb);
@@ -527,6 +531,8 @@ describe('Database', function () {
       d.insert({ now: date1, sth: { name: 'nedb' } }, function () {
         d.findOne({ now: date1 }, function (err, doc) {
           assert.isNull(err);
+          assert.isNotNull(doc);
+
           doc.sth.name.should.equal('nedb');
 
           d.findOne({ now: date2 }, function (err, doc) {

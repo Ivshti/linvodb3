@@ -18,6 +18,10 @@ describe('Cursor', function () {
   beforeEach(function (done) {
     async.waterfall([
      function (cb) {
+      if (! d) return cb();
+      d.store.close(cb);
+     },
+     function (cb) {
         rimraf(testDb, cb);
      },
      function (cb) {
