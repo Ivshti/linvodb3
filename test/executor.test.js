@@ -7,7 +7,6 @@ var should = require('chai').should()
   , async = require('async')
   , model = require('../lib/model')
   , Datastore = require('../lib/datastore')
-  , Persistence = require('../lib/persistence')
   ;
 
 

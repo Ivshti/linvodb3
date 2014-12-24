@@ -7,7 +7,6 @@ var should = require('chai').should()
   , async = require('async')
   , model = require('../lib/model')
   , Datastore = require('../lib/datastore')
-  , Persistence = require('../lib/persistence')
   , Cursor = require('../lib/cursor')
   ;
 
@@ -21,16 +20,7 @@ describe('Cursor', function () {
     d.inMemoryOnly.should.equal(false);
 
     async.waterfall([
-      function (cb) {
-        Persistence.ensureDirectoryExists(path.dirname(testDb), function () {
-          fs.exists(testDb, function (exists) {
-            if (exists) {
-              fs.unlink(testDb, cb);
-            } else { return cb(); }
-          });
-        });
-      }
-    , function (cb) {
+     function (cb) {
         d.loadDatabase(function (err) {
           assert.isNull(err);
           d.getAllData().length.should.equal(0);
