@@ -92,55 +92,11 @@ var testEventLoopStarvation = function(d, done){
 
 describe('Executor', function () {
 
-  describe('With persistent database', function () {
+  describe('With database', function () {
     var d;
 
     beforeEach(function (done) {
-      d = new Datastore({ filename: testDb });
-      d.filename.should.equal(testDb);
-      d.inMemoryOnly.should.equal(false);
-
-      async.waterfall([
-        function (cb) {
-          Persistence.ensureDirectoryExists(path.dirname(testDb), function () {
-            fs.exists(testDb, function (exists) {
-              if (exists) {
-                fs.unlink(testDb, cb);
-              } else { return cb(); }
-            });
-          });
-        }
-      , function (cb) {
-          d.loadDatabase(function (err) {
-            assert.isNull(err);
-            d.getAllData().length.should.equal(0);
-            return cb();
-          });
-        }
-      ], done);
-    });
-
-    it('A throw in a callback doesnt prevent execution of next operations', function(done) {
-      testThrowInCallback(d, done);
-    });
-    
-    it('Operations are executed in the right order', function(done) {
-      testRightOrder(d, done);
-    });
-
-    it('Does not starve event loop and raise warning when more than 1000 callbacks are in queue', function(done){
-      testEventLoopStarvation(d, done);
-    });
-  
-  });   // ==== End of 'With persistent database' ====
-
-
-  describe('With non persistent database', function () {
-    var d;
-
-    beforeEach(function (done) {
-      d = new Datastore({ inMemoryOnly: true });
-      d.inMemoryOnly.should.equal(true);
+      d = new Datastore({ });
 
       d.loadDatabase(function (err) {
         assert.isNull(err);

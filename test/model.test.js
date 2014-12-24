@@ -132,7 +132,7 @@ describe('Model', function () {
       b = model.serialize(e3);
       b = model.serialize(e4);
     });
-    
+    /*
     it('Can serialize string fields with a new line without breaking the DB', function (done) {
       var db1, db2
         , badString = "world\r\nearth\nother\rline"
@@ -161,6 +161,7 @@ describe('Model', function () {
         });
       });
     });
+*/
 
   });   // ==== End of 'Serialization, deserialization' ==== //
 

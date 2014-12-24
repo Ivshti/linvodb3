@@ -17,7 +17,6 @@ describe('Cursor', function () {
   beforeEach(function (done) {
     d = new Datastore({ filename: testDb });
     d.filename.should.equal(testDb);
-    d.inMemoryOnly.should.equal(false);
 
     async.waterfall([
      function (cb) {

@@ -16,7 +16,6 @@ describe('Database', function () {
   beforeEach(function (done) {
     d = new Datastore({ filename: testDb });
     d.filename.should.equal(testDb);
-    d.inMemoryOnly.should.equal(false);
 
     async.waterfall([
       function (cb) {
@@ -32,17 +31,14 @@ describe('Database', function () {
   it('Constructor compatibility with v0.6-', function () {
     var dbef = new Datastore('somefile');
     dbef.filename.should.equal('somefile');
-    dbef.inMemoryOnly.should.equal(false);
 
     var dbef = new Datastore('');
     assert.isNull(dbef.filename);
-    dbef.inMemoryOnly.should.equal(true);
 
     var dbef = new Datastore();
     assert.isNull(dbef.filename);
-    dbef.inMemoryOnly.should.equal(true);
   });
-
+  /*
   describe('Autoloading', function () {
   
     it('Can autoload a database and query it right away', function (done) {
@@ -83,7 +79,7 @@ describe('Database', function () {
     });
  
   });
-
+  */
   describe('Insert', function () {
 
     it('Able to insert a document in the database, setting an _id if none provided, and retrieve it even after a reload', function (done) {
@@ -226,13 +222,15 @@ describe('Database', function () {
           _.find(docs, function (doc) { return doc.a === 42; }).b.should.equal('world');
           
           // The data has been persisted correctly
+          /*
           data = _.filter(fs.readFileSync(testDb, 'utf8').split('\n'), function (line) { return line.length > 0; });
           data.length.should.equal(2);
           model.deserialize(data[0]).a.should.equal(5);
           model.deserialize(data[0]).b.should.equal('hello');
           model.deserialize(data[1]).a.should.equal(42);
           model.deserialize(data[1]).b.should.equal('world');
-                    
+          */
+
           done();
         });
       });
@@ -248,8 +246,8 @@ describe('Database', function () {
       
         d.find({}, function (err, docs) {
           // Datafile only contains index definition
-          var datafileContents = model.deserialize(fs.readFileSync(testDb, 'utf8'));
-          assert.deepEqual(datafileContents, { $$indexCreated: { fieldName: 'a', unique: true } });
+          //var datafileContents = model.deserialize(fs.readFileSync(testDb, 'utf8'));
+          //assert.deepEqual(datafileContents, { $$indexCreated: { fieldName: 'a', unique: true } });
 
           docs.length.should.equal(0);
 
@@ -1507,9 +1505,9 @@ describe('Database', function () {
 
 
   describe('Using indexes', function () {
-
+    
     describe('ensureIndex and index initialization in database loading', function () {
-
+      /*
       it('ensureIndex can be called right after a loadDatabase and be initialized and filled correctly', function (done) {
         var now = new Date()
           , rawData = model.serialize({ _id: "aaa", z: "1", a: 2, ages: [1, 5, 12] }) + '\n' +
@@ -1538,8 +1536,8 @@ describe('Database', function () {
           });
         });
       });
-      
-      it('ensureIndex can be called twice on the same field, the second call will ahve no effect', function (done) {
+
+      it('ensureIndex can be called twice on the same field, the second call will have no effect', function (done) {
         Object.keys(d.indexes).length.should.equal(1);
         Object.keys(d.indexes)[0].should.equal("_id");
       
@@ -1757,6 +1755,7 @@ describe('Database', function () {
           });
         });
       });
+    */
 
     });   // ==== End of 'ensureIndex and index initialization in database loading' ==== //
 
@@ -2244,6 +2243,7 @@ describe('Database', function () {
     });   // ==== End of 'Updating indexes upon document remove' ==== //
     
     
+    /*
     describe('Persisting indexes', function () {
     
       it('Indexes are persisted to a separate file and recreated upon reload', function (done) {
@@ -2458,7 +2458,7 @@ describe('Database', function () {
       });
       
     });   // ==== End of 'Persisting indexes' ====    
-
+    */
   });   // ==== End of 'Using indexes' ==== //
 
 
