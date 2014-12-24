@@ -1859,28 +1859,31 @@ describe('Database', function () {
       });
 
       it('If the index has a unique constraint, an error is thrown if it is violated and the data is not modified', function (done) {
-        d.ensureIndex({ fieldName: 'z', unique: true });
-        d.indexes.z.tree.getNumberOfKeys().should.equal(0);
+        d.ensureIndex({ fieldName: 'y', unique: true });
+        d.indexes.y.tree.getNumberOfKeys().should.equal(0);
 
-        d.insert({ a: 2, z: 'yes' }, function (err, newDoc) {
-          d.indexes.z.tree.getNumberOfKeys().should.equal(1);
-          assert.deepEqual(d.indexes.z.getMatching('yes'), [newDoc]);
+        d.insert({ a: 2, y: 'yes' }, function (err, newDoc) {
+          d.indexes.y.tree.getNumberOfKeys().should.equal(1);
+          assert.deepEqual(d.indexes.y.getMatching('yes'), [newDoc]);
 
-          d.insert({ a: 5, z: 'yes' }, function (err) {
+          d.insert({ a: 5, y: 'yes' }, function (err) {
+            assert.isNotNull(err);
             err.errorType.should.equal('uniqueViolated');
             err.key.should.equal('yes');
 
             // Index didn't change
-            d.indexes.z.tree.getNumberOfKeys().should.equal(1);
-            assert.deepEqual(d.indexes.z.getMatching('yes'), [newDoc]);
+            d.indexes.y.tree.getNumberOfKeys().should.equal(1);
+            assert.deepEqual(d.indexes.y.getMatching('yes'), [newDoc]);
 
             // Data didn't change
             assert.deepEqual(d.getAllData(), [newDoc]);
             d.loadDatabase(function () {
-              d.getAllData().length.should.equal(1);
-              assert.deepEqual(d.getAllData()[0], newDoc);
+              d.find({}, function(err, docs) {
+                docs.length.should.equal(1);
+                assert.deepEqual(docs[0], newDoc);
 
-              done();
+                done();
+              });
             });
           });
         });
