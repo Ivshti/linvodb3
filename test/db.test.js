@@ -391,6 +391,24 @@ describe('Database', function () {
       });
     });
 
+
+    it('Can use an index to get docs with $exists', function (done) {
+      d.insert([
+        { tf: 4, r: 6 },
+        { tf: 4, r: 9 },
+        { tf: 10, r: 2 },
+        { tf: 3 },
+      ], function (err) {
+        d.getCandidates({ r: { $exists: true } }, null, function(data) {
+            data.length.should.equal(3);
+            d.getCandidates({ r: { $exists: false } }, null, function(data) {
+                data.length.should.equal(1);
+                done();
+            });
+        });
+      });
+    });
+
     it('Can use an index to get docs with a basic match on two indexes, with $ne', function (done) {
       d.options.autoIndexing.should.equal(true);
 
