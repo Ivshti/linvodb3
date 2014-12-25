@@ -718,7 +718,8 @@ describe('Database', function () {
         });
       });
     });
-
+    
+    /*
     it('Can use projections in find, normal or cursor way', function (done) {
       d.insert({ a: 2, hello: 'world' }, function (err, doc0) {
         d.insert({ a: 24, hello: 'earth' }, function (err, doc1) {
@@ -778,6 +779,7 @@ describe('Database', function () {
         });
       });
     });
+    */
 
   });   // ==== End of 'Find' ==== //
 
