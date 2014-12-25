@@ -6,8 +6,7 @@ var should = require('chai').should()
   , _ = require('lodash')
   , async = require('async')
   , rimraf = require('rimraf')
-  , model = require('../lib/document')
-  , Datastore = require('../lib/datastore')
+  , Model = require('../lib/model')
   , Cursor = require('../lib/cursor')
   ;
 
@@ -25,10 +24,10 @@ describe('Cursor', function () {
         rimraf(testDb, cb);
      },
      function (cb) {
-        d = new Datastore({ filename: testDb });
+        d = new Model("testDb", { filename: testDb });
         d.filename.should.equal(testDb);
 
-        d.loadDatabase(function (err) {
+        d.reload(function (err) {
           assert.isNull(err);
           d.getAllData().length.should.equal(0);
           return cb();
