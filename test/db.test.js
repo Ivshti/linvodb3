@@ -1249,8 +1249,9 @@ describe('Database', function () {
             d.find({}, function (err, docs) {
               docs.sort(function (a, b) { return a.a - b.a; });
               docs.length.should.equal(2);
-              _.isEqual(docs[0], { _id: doc1._id, a:1, hello: 'world' }).should.equal(true);
-              _.isEqual(docs[1], { _id: doc2._id, a:2, hello: 'changed' }).should.equal(true);
+
+              assert.deepEqual(docs[0], { _id: doc1._id, a:1, hello: 'world' });
+              assert.deepEqual(docs[1], { _id: doc2._id, a:2, hello: 'changed' });
 
               // Even after a reload the database state hasn't changed
               d.reload(function (err) {
@@ -1259,8 +1260,8 @@ describe('Database', function () {
                 d.find({}, function (err, docs) {
                   docs.sort(function (a, b) { return a.a - b.a; });
                   docs.length.should.equal(2);
-                  _.isEqual(docs[0], { _id: doc1._id, a:1, hello: 'world' }).should.equal(true);
-                  _.isEqual(docs[1], { _id: doc2._id, a:2, hello: 'changed' }).should.equal(true);
+                  assert.deepEqual(docs[0], { _id: doc1._id, a:1, hello: 'world' });
+                  assert.deepEqual(docs[1], { _id: doc2._id, a:2, hello: 'changed' });
 
                   done();
                 });
@@ -1281,9 +1282,9 @@ describe('Database', function () {
               d.find({}, function (err, docs) {
                 docs.sort(function (a, b) { return a.a - b.a; });
                 docs.length.should.equal(3);
-                _.isEqual(docs[0], { _id: doc1._id, a:1, hello: 'changed' }).should.equal(true);
-                _.isEqual(docs[1], { _id: doc2._id, a:2, hello: 'changed' }).should.equal(true);
-                _.isEqual(docs[2], { _id: doc3._id, a:5, hello: 'pluton' }).should.equal(true);
+                assert.deepEqual(docs[0], { _id: doc1._id, a:1, hello: 'changed' });
+                assert.deepEqual(docs[1], { _id: doc2._id, a:2, hello: 'changed' });
+                assert.deepEqual(docs[2], { _id: doc3._id, a:5, hello: 'pluton' });
 
                 // Even after a reload the database state hasn't changed
                 d.reload(function (err) {
@@ -1292,9 +1293,9 @@ describe('Database', function () {
                   d.find({}, function (err, docs) {
                     docs.sort(function (a, b) { return a.a - b.a; });
                     docs.length.should.equal(3);
-                    _.isEqual(docs[0], { _id: doc1._id, a:1, hello: 'changed' }).should.equal(true);
-                    _.isEqual(docs[1], { _id: doc2._id, a:2, hello: 'changed' }).should.equal(true);
-                    _.isEqual(docs[2], { _id: doc3._id, a:5, hello: 'pluton' }).should.equal(true);
+                    assert.deepEqual(docs[0], { _id: doc1._id, a:1, hello: 'changed' });
+                    assert.deepEqual(docs[1], { _id: doc2._id, a:2, hello: 'changed' });
+                    assert.deepEqual(docs[2], { _id: doc3._id, a:5, hello: 'pluton' });
 
                     done();
                   });
@@ -1485,8 +1486,8 @@ describe('Database', function () {
               d.find({}, function (err, docs) {
                 docs.sort(function (a, b) { return a.a - b.a; });
                 docs.length.should.equal(2);
-                _.isEqual(docs[0], { _id: doc1._id, a:1, hello: 'world' }).should.equal(true);
-                _.isEqual(docs[1], { _id: doc3._id, a:3, hello: 'moto' }).should.equal(true);
+                assert.deepEqual(docs[0], { _id: doc1._id, a:1, hello: 'world' });
+                assert.deepEqual(docs[1], { _id: doc3._id, a:3, hello: 'moto' });
 
                 // Even after a reload the database state hasn't changed
                 d.reload(function (err) {
@@ -1495,8 +1496,8 @@ describe('Database', function () {
                   d.find({}, function (err, docs) {
                     docs.sort(function (a, b) { return a.a - b.a; });
                     docs.length.should.equal(2);
-                    _.isEqual(docs[0], { _id: doc1._id, a:1, hello: 'world' }).should.equal(true);
-                    _.isEqual(docs[1], { _id: doc3._id, a:3, hello: 'moto' }).should.equal(true);
+                    assert.deepEqual(docs[0], { _id: doc1._id, a:1, hello: 'world' });
+                    assert.deepEqual(docs[1], { _id: doc3._id, a:3, hello: 'moto' });
 
                     done();
                   });
@@ -1517,7 +1518,7 @@ describe('Database', function () {
 
               d.find({}, function (err, docs) {
                 docs.length.should.equal(1);
-                _.isEqual(docs[0], { _id: doc2._id, a:2, hello: 'earth' }).should.equal(true);
+                assert.deepEqual(docs[0], { _id: doc2._id, a:2, hello: 'earth' });
 
                 // Even after a reload the database state hasn't changed
                 d.reload(function (err) {
@@ -1525,7 +1526,7 @@ describe('Database', function () {
 
                   d.find({}, function (err, docs) {
                     docs.length.should.equal(1);
-                    _.isEqual(docs[0], { _id: doc2._id, a:2, hello: 'earth' }).should.equal(true);
+                    assert.deepEqual(docs[0], { _id: doc2._id, a:2, hello: 'earth' });
 
                     done();
                   });
