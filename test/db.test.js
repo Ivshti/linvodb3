@@ -340,11 +340,11 @@ describe('Database', function () {
 
   describe('#getCandidates', function () {
 
-    it('Can use an index to get docs with a basic match', function (done) {
+    it('Can use an index to get docs with a basic match on two indexes', function (done) {
       d.ensureIndex({ fieldName: 'tf' }, function (err) {
-        d.insert({ tf: 4 }, function (err, _doc1) {
-          d.insert({ tf: 6 }, function () {
-            d.insert({ tf: 4, an: 'other' }, function (err, _doc2) {
+        d.insert({ tf: 4, r: 6 }, function (err, _doc1) {
+          d.insert([{ tf: 6 }, { tf: 4, an: 'dont match us' } ], function () {
+            d.insert({ tf: 4, an: 'other', r: 6 }, function (err, _doc2) {
               d.insert({ tf: 9 }, function () {
                 d.getCandidates({ r: 6, tf: 4 }, null, function(data) {
                   var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
@@ -352,8 +352,31 @@ describe('Database', function () {
                     ;
 
                   data.length.should.equal(2);
-                  assert.deepEqual(doc1, { _id: doc1._id, tf: 4 });
-                  assert.deepEqual(doc2, { _id: doc2._id, tf: 4, an: 'other' });
+                  assert.deepEqual(doc1, { _id: doc1._id, tf: 4, r: 6 });
+                  assert.deepEqual(doc2, { _id: doc2._id, tf: 4, an: 'other', r: 6 });
+
+                  done();
+                });
+
+              });
+            });
+          });
+        });
+      });
+    });
+
+    it('Can use an index to get docs with a basic match on two indexes - intersection test', function (done) {
+      d.ensureIndex({ fieldName: 'tf' }, function (err) {
+        d.insert({ tf: 4, r: 6 }, function (err, _doc1) {
+          d.insert({ tf: 6 }, function () {
+            d.insert({ tf: 4, an: 'other', r: 4 }, function (err) {
+              d.insert({ tf: 9 }, function () {
+                d.getCandidates({ r: 6, tf: 4 }, null, function(data) {
+                  var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
+                    ;
+
+                  data.length.should.equal(1);
+                  assert.deepEqual(doc1, { _id: doc1._id, tf: 4, r: 6 });
 
                   done();
                 });
@@ -371,7 +394,7 @@ describe('Database', function () {
           d.insert({ tf: 6 }, function (err, _doc1) {
             d.insert({ tf: 4, an: 'other' }, function (err) {
               d.insert({ tf: 9 }, function (err, _doc2) {
-                d.getCandidates({ r: 6, tf: { $in: [6, 9, 5] } },null,function(data) {
+                d.getCandidates({ tf: { $in: [6, 9, 5] } },null,function(data) {
                   var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
                     , doc2 = _.find(data, function (d) { return d._id === _doc2._id; })
                     ;
@@ -390,42 +413,13 @@ describe('Database', function () {
       });
     });
 
-    it('If no index can be used, return the whole database', function (done) {
-      d.ensureIndex({ fieldName: 'tf' }, function (err) {
-        d.insert({ tf: 4 }, function (err, _doc1) {
-          d.insert({ tf: 6 }, function (err, _doc2) {
-            d.insert({ tf: 4, an: 'other' }, function (err, _doc3) {
-              d.insert({ tf: 9 }, function (err, _doc4) {
-                d.getCandidates({ r: 6, notf: { $in: [6, 9, 5] } }, null, function(data) {
-                  var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
-                    , doc2 = _.find(data, function (d) { return d._id === _doc2._id; })
-                    , doc3 = _.find(data, function (d) { return d._id === _doc3._id; })
-                    , doc4 = _.find(data, function (d) { return d._id === _doc4._id; })
-                    ;
-
-                  data.length.should.equal(4);
-                  assert.deepEqual(doc1, { _id: doc1._id, tf: 4 });
-                  assert.deepEqual(doc2, { _id: doc2._id, tf: 6 });
-                  assert.deepEqual(doc3, { _id: doc3._id, tf: 4, an: 'other' });
-                  assert.deepEqual(doc4, { _id: doc4._id, tf: 9 });
-
-                  done();
-                });
-
-              });
-            });
-          });
-        });
-      });
-    });
-
     it('Can use indexes for comparison matches', function (done) {
       d.ensureIndex({ fieldName: 'tf' }, function (err) {
         d.insert({ tf: 4 }, function (err, _doc1) {
           d.insert({ tf: 6 }, function (err, _doc2) {
             d.insert({ tf: 4, an: 'other' }, function (err, _doc3) {
               d.insert({ tf: 9 }, function (err, _doc4) {
-                d.getCandidates({ r: 6, tf: { $lte: 9, $gte: 6 } }, null, function(data) {
+                d.getCandidates({  tf: { $lte: 9, $gte: 6 } }, null, function(data) {
                   var doc2 = _.find(data, function (d) { return d._id === _doc2._id; })
                     , doc4 = _.find(data, function (d) { return d._id === _doc4._id; })
                     ;
