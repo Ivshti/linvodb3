@@ -395,9 +395,9 @@ describe('Database', function () {
       d.options.autoIndexing.should.equal(true);
 
       d.insert({ tf: 4, r: 6 }, function (err, _doc1) {
-        d.insert({ tf: 5 }, function () {
+        d.insert({ tf: 5, r: 6 }, function () {
           d.insert({ tf: 4, an: 'other', r: 6 }, function (err, _doc2) {
-            d.insert({ tf: 5 }, function () {
+            d.insert({ tf: 9 }, function () {
               d.getCandidates({ tf: { $ne: 5 }, r: 6 }, null, function(data) {
                 var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
                   , doc2 = _.find(data, function (d) { return d._id === _doc2._id; })
