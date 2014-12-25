@@ -812,7 +812,7 @@ describe('Cursor', function () {
     });
 
 
-    it('Auto-build index', function (done) {
+    it('Querying on an un-indexed field triggers re-building indexes (auto-indexing)', function (done) {
       done('Not implemented');
     });
 
