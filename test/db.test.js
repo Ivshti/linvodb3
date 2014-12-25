@@ -448,6 +448,23 @@ describe('Database', function () {
 
 
   describe('Find', function () {
+    it('Can find document by ID', function (done) {
+      async.waterfall([
+      function (cb) {
+        d.insert({ somedata: 'ok' }, function (err, doc) {
+          cb(err, doc)
+        });
+      }
+      , function (doc, cb) {   // Test with query that will return docs
+        d.findById(doc._id, function(err, res) {
+          assert.isNull(err);
+          assert.deepEqual(res, doc);
+
+          cb();
+        });
+      }
+      ], done);
+    });
 
     it('Can find all documents if an empty query is used', function (done) {
       async.waterfall([
@@ -498,6 +515,7 @@ describe('Database', function () {
       }
       ], done);
     });
+
 
     it('Can find one document matching a basic query and return null if none is found', function (done) {
       async.waterfall([
