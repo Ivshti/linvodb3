@@ -391,6 +391,31 @@ describe('Database', function () {
       });
     });
 
+    it('Can use an index to get docs with a basic match on two indexes, with $ne', function (done) {
+      d.options.autoIndexing.should.equal(true);
+
+      d.insert({ tf: 4, r: 6 }, function (err, _doc1) {
+        d.insert({ tf: 5 }, function () {
+          d.insert({ tf: 4, an: 'other', r: 6 }, function (err, _doc2) {
+            d.insert({ tf: 5 }, function () {
+              d.getCandidates({ tf: { $ne: 5 }, r: 6 }, null, function(data) {
+                var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
+                  , doc2 = _.find(data, function (d) { return d._id === _doc2._id; })
+                  ;
+
+                data.length.should.equal(2);
+                assert.deepEqual(doc1, { _id: doc1._id, tf: 4, r: 6 });
+                assert.deepEqual(doc2, { _id: doc2._id, tf: 4, an: 'other', r: 6 });
+
+                done();
+              });
+
+            });
+          });
+        });
+      });
+    });
+
     it('Can use an index to get docs with a basic match on two indexes - intersection test', function (done) {
       d.options.autoIndexing.should.equal(true);
 
@@ -421,6 +446,31 @@ describe('Database', function () {
             d.insert({ tf: 4, an: 'other' }, function (err) {
               d.insert({ tf: 9 }, function (err, _doc2) {
                 d.getCandidates({ tf: { $in: [6, 9, 5] } },null,function(data) {
+                  var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
+                    , doc2 = _.find(data, function (d) { return d._id === _doc2._id; })
+                    ;
+
+                  data.length.should.equal(2);
+                  assert.deepEqual(doc1, { _id: doc1._id, tf: 6 });
+                  assert.deepEqual(doc2, { _id: doc2._id, tf: 9 });
+
+                  done();
+                })
+
+              });
+            });
+          });
+        });
+      });
+    });
+
+    it('Can use an index to get docs with a $nin match', function (done) {
+      d.ensureIndex({ fieldName: 'tf' }, function (err) {
+        d.insert({ tf: 4 }, function (err) {
+          d.insert({ tf: 6 }, function (err, _doc1) {
+            d.insert({ tf: 4, an: 'other' }, function (err) {
+              d.insert({ tf: 9 }, function (err, _doc2) {
+                d.getCandidates({ tf: { $nin: [4, 8, 10] } },null,function(data) {
                   var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
                     , doc2 = _.find(data, function (d) { return d._id === _doc2._id; })
                     ;
