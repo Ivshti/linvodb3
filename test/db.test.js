@@ -340,6 +340,32 @@ describe('Database', function () {
 
   describe('#getCandidates', function () {
 
+    it('Auto-indexing works', function (done) {
+      d.options.autoIndexing.should.equal(true);
+
+      d.insert({ tf: 4, r: 6 }, function (err, _doc1) {
+        d.getCandidates({ r: 6, tf: 4 }, null, function(data) {
+          assert.isDefined(d.indexes.tf);
+          assert.isDefined(d.indexes.r);
+          done();
+        });
+      });
+    });
+
+
+    it('Auto-indexing can be disabled', function (done) {
+      d.options.autoIndexing.should.equal(true);
+      d.options.autoIndexing = false;
+
+      d.insert({ tf: 4, r: 6 }, function (err, _doc1) {
+        d.getCandidates({ r: 6, tf: 4 }, null, function(data) {
+          assert.isUndefined(d.indexes.tf);
+          assert.isUndefined(d.indexes.r);
+          done();
+        });
+      });
+    });
+
     it('Can use an index to get docs with a basic match on two indexes', function (done) {
       d.options.autoIndexing.should.equal(true);
 
