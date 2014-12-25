@@ -771,6 +771,62 @@ describe('Cursor', function () {
 
   });   // ==== End of 'Projections' ====
 
+
+  describe('getIdsForQuery', function() {
+    it('Exact match by one index', function (done) {
+      done('Not implemented')
+    });
+
+    it('Range match by one index', function (done) {
+      done('Not implemented')
+    });
+
+    it('Exact match by two indexes', function (done) {
+      done('Not implemented')
+    });
+
+    it('Mixed match by two indexes', function (done) {
+      done('Not implemented')
+    });
+
+    // TODO: all operators
+    // TODO: logical operators
+  });  // ===== End of 'getIdsForQuery' =====
+
+
+
+  describe('getMatches', function() {
+    it('Auto-build index', function (done) {
+      done('Not implemented')    
+    });
+
+    it('Auto-build a few indexes, debounce test', function (done) {
+      // Requires DB to emit events
+      done('Not implemented')    
+    });
+
+    it('Retrieve IDs', function (done) {
+      done('Not implemented')    
+    });
+
+    it('Retrieve objects', function (done) {
+      done('Not implemented')
+
+    });
+
+
+    it('Close stops stream', function (done) {
+      done('Not implemented')
+
+    }); 
+
+    it('lock/unlock value from the stream', function (done) {
+      done('Not implemented')
+
+    });       
+  });  // ===== End of 'getMatches' =====
+
+
 });
 
 
