@@ -341,24 +341,24 @@ describe('Database', function () {
   describe('#getCandidates', function () {
 
     it('Can use an index to get docs with a basic match on two indexes', function (done) {
-      d.ensureIndex({ fieldName: 'tf' }, function (err) {
-        d.insert({ tf: 4, r: 6 }, function (err, _doc1) {
-          d.insert([{ tf: 6 }, { tf: 4, an: 'dont match us' } ], function () {
-            d.insert({ tf: 4, an: 'other', r: 6 }, function (err, _doc2) {
-              d.insert({ tf: 9 }, function () {
-                d.getCandidates({ r: 6, tf: 4 }, null, function(data) {
-                  var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
-                    , doc2 = _.find(data, function (d) { return d._id === _doc2._id; })
-                    ;
+      d.options.autoIndexing.should.equal(true);
 
-                  data.length.should.equal(2);
-                  assert.deepEqual(doc1, { _id: doc1._id, tf: 4, r: 6 });
-                  assert.deepEqual(doc2, { _id: doc2._id, tf: 4, an: 'other', r: 6 });
+      d.insert({ tf: 4, r: 6 }, function (err, _doc1) {
+        d.insert([{ tf: 6 }, { tf: 4, an: 'dont match us' } ], function () {
+          d.insert({ tf: 4, an: 'other', r: 6 }, function (err, _doc2) {
+            d.insert({ tf: 9 }, function () {
+              d.getCandidates({ r: 6, tf: 4 }, null, function(data) {
+                var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
+                  , doc2 = _.find(data, function (d) { return d._id === _doc2._id; })
+                  ;
 
-                  done();
-                });
+                data.length.should.equal(2);
+                assert.deepEqual(doc1, { _id: doc1._id, tf: 4, r: 6 });
+                assert.deepEqual(doc2, { _id: doc2._id, tf: 4, an: 'other', r: 6 });
 
+                done();
               });
+
             });
           });
         });
@@ -366,22 +366,22 @@ describe('Database', function () {
     });
 
     it('Can use an index to get docs with a basic match on two indexes - intersection test', function (done) {
-      d.ensureIndex({ fieldName: 'tf' }, function (err) {
-        d.insert({ tf: 4, r: 6 }, function (err, _doc1) {
-          d.insert({ tf: 6 }, function () {
-            d.insert({ tf: 4, an: 'other', r: 4 }, function (err) {
-              d.insert({ tf: 9 }, function () {
-                d.getCandidates({ r: 6, tf: 4 }, null, function(data) {
-                  var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
-                    ;
+      d.options.autoIndexing.should.equal(true);
 
-                  data.length.should.equal(1);
-                  assert.deepEqual(doc1, { _id: doc1._id, tf: 4, r: 6 });
+      d.insert({ tf: 4, r: 6 }, function (err, _doc1) {
+        d.insert({ tf: 6 }, function () {
+          d.insert({ tf: 4, an: 'other', r: 4 }, function (err) {
+            d.insert({ tf: 9 }, function () {
+              d.getCandidates({ r: 6, tf: 4 }, null, function(data) {
+                var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
+                  ;
 
-                  done();
-                });
+                data.length.should.equal(1);
+                assert.deepEqual(doc1, { _id: doc1._id, tf: 4, r: 6 });
 
+                done();
               });
+
             });
           });
         });
