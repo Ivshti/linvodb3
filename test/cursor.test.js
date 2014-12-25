@@ -786,7 +786,7 @@ describe('Cursor', function () {
         { age: 46, name: "Toby", department: "hr" },
         { age: 45, name: "Phyllis", department: "sales" },
         { age: 23, name: "Ryan", department: "sales" },
-        
+
       ], function (err) {
         done();
       });
@@ -805,22 +805,6 @@ describe('Cursor', function () {
           done('Not implemented')
         });
       });
-    });
-
-    it('Range match by one index', function (done) {
-      done('Not implemented')
-    });
-
-    it('Exact match by indexes on dot value', function (done) {
-      done('Not implemented')
-    });
-
-    it('Exact match by two indexes', function (done) {
-      done('Not implemented')
-    });
-
-    it('Mixed match by two indexes', function (done) {
-      done('Not implemented')
     });
 
 
