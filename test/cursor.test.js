@@ -773,12 +773,20 @@ describe('Cursor', function () {
 
 
   describe('getMatches', function() {
+    // Comparison operators: $lt $lte $gt $gte $ne $in $nin $regex $exists $size 
+    // Logical operators: $or $and $not $where
+    // We need to test all operators supported by getMatches
+
     beforeEach(function (done) {
       d.insert([
-        { age: 5 },
-        { age: 57 },
-        { age: 52 }, 
-        { age: 20 }
+        { age: 27, name: "Kelly", department: "support" },
+        { age: 31, name: "Jim", department: "sales" },
+        { age: 33, name: "Dwight", department: "sales" }, 
+        { age: 45, name: "Michael", department: "management" },
+        { age: 46, name: "Toby", department: "hr" },
+        { age: 45, name: "Phyllis", department: "sales" },
+        { age: 23, name: "Ryan", department: "sales" },
+        
       ], function (err) {
         done();
       });
@@ -787,9 +795,9 @@ describe('Cursor', function () {
     it('Exact match by one index', function (done) {
       // Dummy find to make sure indexes are up to date
       d.find({ }, function(err, docs) {
-        var doc1 = _.filter(docs, function(doc) { return doc.age === 57; })[0];
+        var doc1 = _.filter(docs, function(doc) { return doc.name === "Jim"; })[0];
 
-        var stream = Cursor.getMatchesStream(d, { age: 57 });
+        var stream = Cursor.getMatchesStream(d, { name: "Jim" });
         stream.on("ids", function(ids) { 
           console.log(ids);
 
@@ -800,6 +808,10 @@ describe('Cursor', function () {
     });
 
     it('Range match by one index', function (done) {
+      done('Not implemented')
+    });
+
+    it('Exact match by indexes on dot value', function (done) {
       done('Not implemented')
     });
 
