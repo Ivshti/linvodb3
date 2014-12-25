@@ -25,6 +25,7 @@ describe('Database', function () {
        },
       function (cb) {
         d = new Model("testDb1", { filename: testDb });
+
         d.filename.should.equal(testDb);
 
         d.reload(function (err) {
