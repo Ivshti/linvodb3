@@ -772,9 +772,31 @@ describe('Cursor', function () {
   });   // ==== End of 'Projections' ====
 
 
-  describe('getIdsForQuery', function() {
+  describe('getMatches', function() {
+    beforeEach(function (done) {
+      d.insert([
+        { age: 5 },
+        { age: 57 },
+        { age: 52 }, 
+        { age: 20 }
+      ], function (err) {
+        done();
+      });
+    });
+
     it('Exact match by one index', function (done) {
-      done('Not implemented')
+      // Dummy find to make sure indexes are up to date
+      d.find({ }, function(err, docs) {
+        var doc1 = _.filter(docs, function(doc) { return doc.age === 57; })[0];
+
+        var stream = Cursor.getMatchesStream(d, { age: 57 });
+        stream.on("ids", function(ids) { 
+          console.log(ids);
+
+          console.log(doc1);
+          done('Not implemented')
+        });
+      });
     });
 
     it('Range match by one index', function (done) {
@@ -789,15 +811,9 @@ describe('Cursor', function () {
       done('Not implemented')
     });
 
-    // TODO: all operators
-    // TODO: logical operators
-  });  // ===== End of 'getIdsForQuery' =====
 
-
-
-  describe('getMatches', function() {
     it('Auto-build index', function (done) {
-      done('Not implemented')    
+      done('Not implemented');
     });
 
     it('Auto-build a few indexes, debounce test', function (done) {
