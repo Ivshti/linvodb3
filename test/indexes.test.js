@@ -12,10 +12,10 @@ describe('Indexes', function () {
   describe('Insertion', function () {
 
     it('Can insert pointers to documents in the index correctly when they have the field', function () {
-      var idx = new Index({ fieldName: 'tf' })
-        , doc1 = { a: 5, tf: 'hello' }
-        , doc2 = { a: 8, tf: 'world' }
-        , doc3 = { a: 2, tf: 'bloup' }
+      var idx = new Index({ fieldName: '_id' })
+        , doc1 = { a: 5, _id: 'hello' }
+        , doc2 = { a: 8, _id: 'world' }
+        , doc3 = { a: 2, _id: 'bloup' }
         ;
 
       idx.insert(doc1);
@@ -24,14 +24,12 @@ describe('Indexes', function () {
 
       // The underlying BST now has 3 nodes which contain the docs where it's expected
       idx.tree.getNumberOfKeys().should.equal(3);
-      assert.deepEqual(idx.tree.search('hello'), [{ a: 5, tf: 'hello' }]);
-      assert.deepEqual(idx.tree.search('world'), [{ a: 8, tf: 'world' }]);
-      assert.deepEqual(idx.tree.search('bloup'), [{ a: 2, tf: 'bloup' }]);
+      assert.deepEqual(idx.tree.search('hello'), ['hello']);
+      assert.deepEqual(idx.tree.search('world'), ['world']);
+      assert.deepEqual(idx.tree.search('bloup'), ['bloup']);
 
-      // The nodes contain pointers to the actual documents
-      idx.tree.search('world')[0].should.equal(doc2);
-      idx.tree.search('bloup')[0].a = 42;
-      doc3.a.should.equal(42);
+      // The nodes contain _id of the actual documents
+      idx.tree.search('world')[0].should.equal(doc2._id);
     });
 
     it('Inserting twice for the same fieldName in a unique index will result in an error thrown', function () {
@@ -68,9 +66,9 @@ describe('Indexes', function () {
 
     it('Works with dot notation', function () {
       var idx = new Index({ fieldName: 'tf.nested' })
-        , doc1 = { a: 5, tf: { nested: 'hello' } }
-        , doc2 = { a: 8, tf: { nested: 'world', additional: true } }
-        , doc3 = { a: 2, tf: { nested: 'bloup', age: 42 } }
+        , doc1 = { _id: 5, tf: { nested: 'hello' } }
+        , doc2 = { _id: 8, tf: { nested: 'world', additional: true } }
+        , doc3 = { _id: 2, tf: { nested: 'bloup', age: 42 } }
         ;
 
       idx.insert(doc1);
@@ -79,27 +77,23 @@ describe('Indexes', function () {
 
       // The underlying BST now has 3 nodes which contain the docs where it's expected
       idx.tree.getNumberOfKeys().should.equal(3);
-      assert.deepEqual(idx.tree.search('hello'), [doc1]);
-      assert.deepEqual(idx.tree.search('world'), [doc2]);
-      assert.deepEqual(idx.tree.search('bloup'), [doc3]);
-
-      // The nodes contain pointers to the actual documents
-      idx.tree.search('bloup')[0].a = 42;
-      doc3.a.should.equal(42);
+      assert.deepEqual(idx.tree.search('hello'), [doc1._id]);
+      assert.deepEqual(idx.tree.search('world'), [doc2._id]);
+      assert.deepEqual(idx.tree.search('bloup'), [doc3._id]);
     });
 
     it('Can insert an array of documents', function () {
       var idx = new Index({ fieldName: 'tf' })
-        , doc1 = { a: 5, tf: 'hello' }
-        , doc2 = { a: 8, tf: 'world' }
-        , doc3 = { a: 2, tf: 'bloup' }
+        , doc1 = { _id: 5, tf: 'hello' }
+        , doc2 = { _id: 8, tf: 'world' }
+        , doc3 = { _id: 2, tf: 'bloup' }
         ;
 
       idx.insert([doc1, doc2, doc3]);
       idx.tree.getNumberOfKeys().should.equal(3);
-      assert.deepEqual(idx.tree.search('hello'), [doc1]);
-      assert.deepEqual(idx.tree.search('world'), [doc2]);
-      assert.deepEqual(idx.tree.search('bloup'), [doc3]);
+      assert.deepEqual(idx.tree.search('hello'), [doc1._id]);
+      assert.deepEqual(idx.tree.search('world'), [doc2._id]);
+      assert.deepEqual(idx.tree.search('bloup'), [doc3._id]);
     });
 
     it('When inserting an array of elements, if an error is thrown all inserts need to be rolled back', function () {
@@ -124,76 +118,76 @@ describe('Indexes', function () {
 	describe('Array fields', function () {
 	
 	  it('Inserts one entry per array element in the index', function () {
-      var obj = { tf: ['aa', 'bb'], really: 'yeah' }
-        , obj2 = { tf: 'normal', yes: 'indeed' }
+      var obj = { tf: ['aa', 'bb'], really: 'yeah', _id: 1 }
+        , obj2 = { tf: 'normal', yes: 'indeed', _id: 2 }
         , idx = new Index({ fieldName: 'tf' })
         ;
       
       idx.insert(obj);
       idx.getAll().length.should.equal(2);
-      idx.getAll()[0].should.equal(obj);
-      idx.getAll()[1].should.equal(obj);
+      idx.getAll()[0].should.equal(obj._id);
+      idx.getAll()[1].should.equal(obj._id);
 
       idx.insert(obj2);
       idx.getAll().length.should.equal(3);
 	  });
 
 	  it('Inserts one entry per array element in the index, type-checked', function () {
-      var obj = { tf: ['42', 42, new Date(42), 42], really: 'yeah' }
+      var obj = { tf: ['42', 42, new Date(42), 42], really: 'yeah', _id: 1 }
         , idx = new Index({ fieldName: 'tf' })
         ;
       
       idx.insert(obj);
       idx.getAll().length.should.equal(3);
-      idx.getAll()[0].should.equal(obj);
-      idx.getAll()[1].should.equal(obj);
-      idx.getAll()[2].should.equal(obj);
+      idx.getAll()[0].should.equal(obj._id);
+      idx.getAll()[1].should.equal(obj._id);
+      idx.getAll()[2].should.equal(obj._id);
 	  });
     
 	  it('Inserts one entry per unique array element in the index, the unique constraint only holds across documents', function () {
-      var obj = { tf: ['aa', 'aa'], really: 'yeah' }
-        , obj2 = { tf: ['cc', 'yy', 'cc'], yes: 'indeed' }
+      var obj = { tf: ['aa', 'aa'], really: 'yeah', _id: 1 }
+        , obj2 = { tf: ['cc', 'yy', 'cc'], yes: 'indeed', _id: 2 }
         , idx = new Index({ fieldName: 'tf', unique: true })
         ;
       
       idx.insert(obj);
       idx.getAll().length.should.equal(1);
-      idx.getAll()[0].should.equal(obj);
+      idx.getAll()[0].should.equal(obj._id);
 
       idx.insert(obj2);
       idx.getAll().length.should.equal(3);
 	  });
 
 	  it('The unique constraint holds across documents', function () {
-      var obj = { tf: ['aa', 'aa'], really: 'yeah' }
-        , obj2 = { tf: ['cc', 'aa', 'cc'], yes: 'indeed' }
+      var obj = { tf: ['aa', 'aa'], really: 'yeah', _id: 1 }
+        , obj2 = { tf: ['cc', 'aa', 'cc'], yes: 'indeed', _id: 2 }
         , idx = new Index({ fieldName: 'tf', unique: true })
         ;
       
       idx.insert(obj);
       idx.getAll().length.should.equal(1);
-      idx.getAll()[0].should.equal(obj);
+      idx.getAll()[0].should.equal(obj._id);
 
       (function () { idx.insert(obj2); }).should.throw();
 	  });
     
     it('When removing a document, remove it from the index at all unique array elements', function () {
-      var obj = { tf: ['aa', 'aa'], really: 'yeah' }
-        , obj2 = { tf: ['cc', 'aa', 'cc'], yes: 'indeed' }
+      var obj = { tf: ['aa', 'aa'], really: 'yeah', _id: 1 }
+        , obj2 = { tf: ['cc', 'aa', 'cc'], yes: 'indeed', _id: 2 }
         , idx = new Index({ fieldName: 'tf' })
         ;
       
       idx.insert(obj);
       idx.insert(obj2);
       idx.getMatching('aa').length.should.equal(2);
-      idx.getMatching('aa').indexOf(obj).should.not.equal(-1);
-      idx.getMatching('aa').indexOf(obj2).should.not.equal(-1);
+      idx.getMatching('aa').indexOf(obj._id).should.not.equal(-1);
+      idx.getMatching('aa').indexOf(obj2._id).should.not.equal(-1);
       idx.getMatching('cc').length.should.equal(1);
 
       idx.remove(obj2);
       idx.getMatching('aa').length.should.equal(1);
-      idx.getMatching('aa').indexOf(obj).should.not.equal(-1);
-      idx.getMatching('aa').indexOf(obj2).should.equal(-1);
+      idx.getMatching('aa').indexOf(obj._id).should.not.equal(-1);
+      idx.getMatching('aa').indexOf(obj2._id).should.equal(-1);
       idx.getMatching('cc').length.should.equal(0);      
     });
     
@@ -229,10 +223,10 @@ describe('Indexes', function () {
 
     it('Can remove pointers from the index, even when multiple documents have the same key', function () {
       var idx = new Index({ fieldName: 'tf' })
-        , doc1 = { a: 5, tf: 'hello' }
-        , doc2 = { a: 8, tf: 'world' }
-        , doc3 = { a: 2, tf: 'bloup' }
-        , doc4 = { a: 23, tf: 'world' }
+        , doc1 = { a: 5, tf: 'hello', _id: 1 }
+        , doc2 = { a: 8, tf: 'world', _id: 2 }
+        , doc3 = { a: 2, tf: 'bloup', _id: 3 }
+        , doc4 = { a: 23, tf: 'world', _id: 4 }
         ;
 
       idx.insert(doc1);
@@ -248,7 +242,7 @@ describe('Indexes', function () {
       idx.remove(doc2);
       idx.tree.getNumberOfKeys().should.equal(2);
       idx.tree.search('world').length.should.equal(1);
-      idx.tree.search('world')[0].should.equal(doc4);
+      idx.tree.search('world')[0].should.equal(doc4._id);
     });
 
     it('If we have a sparse index, removing a non indexed doc has no effect', function () {
@@ -267,10 +261,10 @@ describe('Indexes', function () {
 
     it('Works with dot notation', function () {
       var idx = new Index({ fieldName: 'tf.nested' })
-        , doc1 = { a: 5, tf: { nested: 'hello' } }
-        , doc2 = { a: 8, tf: { nested: 'world', additional: true } }
-        , doc3 = { a: 2, tf: { nested: 'bloup', age: 42 } }
-        , doc4 = { a: 2, tf: { nested: 'world', fruits: ['apple', 'carrot'] } }
+        , doc1 = { _id: 5, tf: { nested: 'hello' } }
+        , doc2 = { _id: 8, tf: { nested: 'world', additional: true } }
+        , doc3 = { _id: 2, tf: { nested: 'bloup', age: 42 } }
+        , doc4 = { _id: 2, tf: { nested: 'world', fruits: ['apple', 'carrot'] } }
         ;
 
       idx.insert(doc1);
@@ -286,14 +280,14 @@ describe('Indexes', function () {
       idx.remove(doc2);
       idx.tree.getNumberOfKeys().should.equal(2);
       idx.tree.search('world').length.should.equal(1);
-      idx.tree.search('world')[0].should.equal(doc4);
+      idx.tree.search('world')[0].should.equal(doc4._id);
     });
 
     it('Can remove an array of documents', function () {
       var idx = new Index({ fieldName: 'tf' })
-        , doc1 = { a: 5, tf: 'hello' }
-        , doc2 = { a: 8, tf: 'world' }
-        , doc3 = { a: 2, tf: 'bloup' }
+        , doc1 = { _id: 5, tf: 'hello' }
+        , doc2 = { _id: 8, tf: 'world' }
+        , doc3 = { _id: 2, tf: 'bloup' }
         ;
 
       idx.insert([doc1, doc2, doc3]);
@@ -301,7 +295,7 @@ describe('Indexes', function () {
       idx.remove([doc1, doc3]);
       idx.tree.getNumberOfKeys().should.equal(1);
       assert.deepEqual(idx.tree.search('hello'), []);
-      assert.deepEqual(idx.tree.search('world'), [doc2]);
+      assert.deepEqual(idx.tree.search('world'), [doc2._id]);
       assert.deepEqual(idx.tree.search('bloup'), []);
     });
 
@@ -312,35 +306,35 @@ describe('Indexes', function () {
 
     it('Can update a document whose key did or didnt change', function () {
       var idx = new Index({ fieldName: 'tf' })
-        , doc1 = { a: 5, tf: 'hello' }
-        , doc2 = { a: 8, tf: 'world' }
-        , doc3 = { a: 2, tf: 'bloup' }
-        , doc4 = { a: 23, tf: 'world' }
-        , doc5 = { a: 1, tf: 'changed' }
+        , doc1 = { _id: 5, tf: 'hello' }
+        , doc2 = { _id: 8, tf: 'world' }
+        , doc3 = { _id: 2, tf: 'bloup' }
+        , doc4 = { _id: 23, tf: 'world' }
+        , doc5 = { _id: 1, tf: 'changed' }
         ;
 
       idx.insert(doc1);
       idx.insert(doc2);
       idx.insert(doc3);
       idx.tree.getNumberOfKeys().should.equal(3);
-      assert.deepEqual(idx.tree.search('world'), [doc2]);
+      assert.deepEqual(idx.tree.search('world'), [doc2._id]);
 
       idx.update(doc2, doc4);
       idx.tree.getNumberOfKeys().should.equal(3);
-      assert.deepEqual(idx.tree.search('world'), [doc4]);
+      assert.deepEqual(idx.tree.search('world'), [doc4._id]);
 
       idx.update(doc1, doc5);
       idx.tree.getNumberOfKeys().should.equal(3);
       assert.deepEqual(idx.tree.search('hello'), []);
-      assert.deepEqual(idx.tree.search('changed'), [doc5]);
+      assert.deepEqual(idx.tree.search('changed'), [doc5._id]);
     });
 
     it('If a simple update violates a unique constraint, changes are rolled back and an error thrown', function () {
       var idx = new Index({ fieldName: 'tf', unique: true })
-        , doc1 = { a: 5, tf: 'hello' }
-        , doc2 = { a: 8, tf: 'world' }
-        , doc3 = { a: 2, tf: 'bloup' }
-        , bad = { a: 23, tf: 'world' }
+        , doc1 = { _id: 5, tf: 'hello' }
+        , doc2 = { _id: 8, tf: 'world' }
+        , doc3 = { _id: 2, tf: 'bloup' }
+        , bad = { _id: 23, tf: 'world' }
         ;
 
       idx.insert(doc1);
@@ -348,9 +342,9 @@ describe('Indexes', function () {
       idx.insert(doc3);
 
       idx.tree.getNumberOfKeys().should.equal(3);
-      assert.deepEqual(idx.tree.search('hello'), [doc1]);
-      assert.deepEqual(idx.tree.search('world'), [doc2]);
-      assert.deepEqual(idx.tree.search('bloup'), [doc3]);
+      assert.deepEqual(idx.tree.search('hello'), [doc1._id]);
+      assert.deepEqual(idx.tree.search('world'), [doc2._id]);
+      assert.deepEqual(idx.tree.search('bloup'), [doc3._id]);
 
       try {
         idx.update(doc3, bad);
@@ -360,19 +354,19 @@ describe('Indexes', function () {
 
       // No change
       idx.tree.getNumberOfKeys().should.equal(3);
-      assert.deepEqual(idx.tree.search('hello'), [doc1]);
-      assert.deepEqual(idx.tree.search('world'), [doc2]);
-      assert.deepEqual(idx.tree.search('bloup'), [doc3]);
+      assert.deepEqual(idx.tree.search('hello'), [doc1._id]);
+      assert.deepEqual(idx.tree.search('world'), [doc2._id]);
+      assert.deepEqual(idx.tree.search('bloup'), [doc3._id]);
     });
 
     it('Can update an array of documents', function () {
       var idx = new Index({ fieldName: 'tf' })
-        , doc1 = { a: 5, tf: 'hello' }
-        , doc2 = { a: 8, tf: 'world' }
-        , doc3 = { a: 2, tf: 'bloup' }
-        , doc1b = { a: 23, tf: 'world' }
-        , doc2b = { a: 1, tf: 'changed' }
-        , doc3b = { a: 44, tf: 'bloup' }
+        , doc1 = { _id: 5, tf: 'hello' }
+        , doc2 = { _id: 8, tf: 'world' }
+        , doc3 = { _id: 2, tf: 'bloup' }
+        , doc1b = { _id: 23, tf: 'world' }
+        , doc2b = { _id: 1, tf: 'changed' }
+        , doc3b = { _id: 44, tf: 'bloup' }
         ;
 
       idx.insert(doc1);
@@ -384,23 +378,23 @@ describe('Indexes', function () {
 
       idx.tree.getNumberOfKeys().should.equal(3);
       idx.getMatching('world').length.should.equal(1);
-      idx.getMatching('world')[0].should.equal(doc1b);
+      idx.getMatching('world')[0].should.equal(doc1b._id);
       idx.getMatching('changed').length.should.equal(1);
-      idx.getMatching('changed')[0].should.equal(doc2b);
+      idx.getMatching('changed')[0].should.equal(doc2b._id);
       idx.getMatching('bloup').length.should.equal(1);
-      idx.getMatching('bloup')[0].should.equal(doc3b);
+      idx.getMatching('bloup')[0].should.equal(doc3b._id);
     });
 
     it('If a unique constraint is violated during an array-update, all changes are rolled back and an error thrown', function () {
       var idx = new Index({ fieldName: 'tf', unique: true })
-        , doc0 = { a: 432, tf: 'notthistoo' }
-        , doc1 = { a: 5, tf: 'hello' }
-        , doc2 = { a: 8, tf: 'world' }
-        , doc3 = { a: 2, tf: 'bloup' }
-        , doc1b = { a: 23, tf: 'changed' }
-        , doc2b = { a: 1, tf: 'changed' }   // Will violate the constraint (first try)
-        , doc2c = { a: 1, tf: 'notthistoo' }   // Will violate the constraint (second try)
-        , doc3b = { a: 44, tf: 'alsochanged' }
+        , doc0 = { _id: 432, tf: 'notthistoo' }
+        , doc1 = { _id: 5, tf: 'hello' }
+        , doc2 = { _id: 8, tf: 'world' }
+        , doc3 = { _id: 2, tf: 'bloup' }
+        , doc1b = { _id: 23, tf: 'changed' }
+        , doc2b = { _id: 1, tf: 'changed' }   // Will violate the constraint (first try)
+        , doc2c = { _id: 1, tf: 'notthistoo' }   // Will violate the constraint (second try)
+        , doc3b = { _id: 44, tf: 'alsochanged' }
         ;
 
       idx.insert(doc1);
@@ -416,11 +410,11 @@ describe('Indexes', function () {
 
       idx.tree.getNumberOfKeys().should.equal(3);
       idx.getMatching('hello').length.should.equal(1);
-      idx.getMatching('hello')[0].should.equal(doc1);
+      idx.getMatching('hello')[0].should.equal(doc1._id);
       idx.getMatching('world').length.should.equal(1);
-      idx.getMatching('world')[0].should.equal(doc2);
+      idx.getMatching('world')[0].should.equal(doc2._id);
       idx.getMatching('bloup').length.should.equal(1);
-      idx.getMatching('bloup')[0].should.equal(doc3);
+      idx.getMatching('bloup')[0].should.equal(doc3._id);
 
       try {
         idx.update([{ oldDoc: doc1, newDoc: doc1b }, { oldDoc: doc2, newDoc: doc2b }, { oldDoc: doc3, newDoc: doc3b }]);
@@ -430,40 +424,40 @@ describe('Indexes', function () {
 
       idx.tree.getNumberOfKeys().should.equal(3);
       idx.getMatching('hello').length.should.equal(1);
-      idx.getMatching('hello')[0].should.equal(doc1);
+      idx.getMatching('hello')[0].should.equal(doc1._id);
       idx.getMatching('world').length.should.equal(1);
-      idx.getMatching('world')[0].should.equal(doc2);
+      idx.getMatching('world')[0].should.equal(doc2._id);
       idx.getMatching('bloup').length.should.equal(1);
-      idx.getMatching('bloup')[0].should.equal(doc3);
+      idx.getMatching('bloup')[0].should.equal(doc3._id);
     });
 
     it('If an update doesnt change a document, the unique constraint is not violated', function () {
       var idx = new Index({ fieldName: 'tf', unique: true })
-        , doc1 = { a: 5, tf: 'hello' }
-        , doc2 = { a: 8, tf: 'world' }
-        , doc3 = { a: 2, tf: 'bloup' }
-        , noChange = { a: 8, tf: 'world' }
+        , doc1 = { _id: 5, tf: 'hello' }
+        , doc2 = { _id: 8, tf: 'world' }
+        , doc3 = { _id: 2, tf: 'bloup' }
+        , noChange = { _id: 8, tf: 'world' }
         ;
 
       idx.insert(doc1);
       idx.insert(doc2);
       idx.insert(doc3);
       idx.tree.getNumberOfKeys().should.equal(3);
-      assert.deepEqual(idx.tree.search('world'), [doc2]);
+      assert.deepEqual(idx.tree.search('world'), [doc2._id]);
 
       idx.update(doc2, noChange);   // No error thrown
       idx.tree.getNumberOfKeys().should.equal(3);
-      assert.deepEqual(idx.tree.search('world'), [noChange]);
+      assert.deepEqual(idx.tree.search('world'), [noChange._id]);
     });
 
     it('Can revert simple and batch updates', function () {
       var idx = new Index({ fieldName: 'tf' })
-        , doc1 = { a: 5, tf: 'hello' }
-        , doc2 = { a: 8, tf: 'world' }
-        , doc3 = { a: 2, tf: 'bloup' }
-        , doc1b = { a: 23, tf: 'world' }
-        , doc2b = { a: 1, tf: 'changed' }
-        , doc3b = { a: 44, tf: 'bloup' }
+        , doc1 = { _id: 5, tf: 'hello' }
+        , doc2 = { _id: 8, tf: 'world' }
+        , doc3 = { _id: 2, tf: 'bloup' }
+        , doc1b = { _id: 23, tf: 'world' }
+        , doc2b = { _id: 1, tf: 'changed' }
+        , doc3b = { _id: 44, tf: 'bloup' }
         , batchUpdate = [{ oldDoc: doc1, newDoc: doc1b }, { oldDoc: doc2, newDoc: doc2b }, { oldDoc: doc3, newDoc: doc3b }]
         ;
 
@@ -476,42 +470,42 @@ describe('Indexes', function () {
 
       idx.tree.getNumberOfKeys().should.equal(3);
       idx.getMatching('world').length.should.equal(1);
-      idx.getMatching('world')[0].should.equal(doc1b);
+      idx.getMatching('world')[0].should.equal(doc1b._id);
       idx.getMatching('changed').length.should.equal(1);
-      idx.getMatching('changed')[0].should.equal(doc2b);
+      idx.getMatching('changed')[0].should.equal(doc2b._id);
       idx.getMatching('bloup').length.should.equal(1);
-      idx.getMatching('bloup')[0].should.equal(doc3b);
+      idx.getMatching('bloup')[0].should.equal(doc3b._id);
 
       idx.revertUpdate(batchUpdate);
 
       idx.tree.getNumberOfKeys().should.equal(3);
       idx.getMatching('hello').length.should.equal(1);
-      idx.getMatching('hello')[0].should.equal(doc1);
+      idx.getMatching('hello')[0].should.equal(doc1._id);
       idx.getMatching('world').length.should.equal(1);
-      idx.getMatching('world')[0].should.equal(doc2);
+      idx.getMatching('world')[0].should.equal(doc2._id);
       idx.getMatching('bloup').length.should.equal(1);
-      idx.getMatching('bloup')[0].should.equal(doc3);
+      idx.getMatching('bloup')[0].should.equal(doc3._id);
 
       // Now a simple update
       idx.update(doc2, doc2b);
 
       idx.tree.getNumberOfKeys().should.equal(3);
       idx.getMatching('hello').length.should.equal(1);
-      idx.getMatching('hello')[0].should.equal(doc1);
+      idx.getMatching('hello')[0].should.equal(doc1._id);
       idx.getMatching('changed').length.should.equal(1);
-      idx.getMatching('changed')[0].should.equal(doc2b);
+      idx.getMatching('changed')[0].should.equal(doc2b._id);
       idx.getMatching('bloup').length.should.equal(1);
-      idx.getMatching('bloup')[0].should.equal(doc3);
+      idx.getMatching('bloup')[0].should.equal(doc3._id);
 
       idx.revertUpdate(doc2, doc2b);
 
       idx.tree.getNumberOfKeys().should.equal(3);
       idx.getMatching('hello').length.should.equal(1);
-      idx.getMatching('hello')[0].should.equal(doc1);
+      idx.getMatching('hello')[0].should.equal(doc1._id);
       idx.getMatching('world').length.should.equal(1);
-      idx.getMatching('world')[0].should.equal(doc2);
+      idx.getMatching('world')[0].should.equal(doc2._id);
       idx.getMatching('bloup').length.should.equal(1);
-      idx.getMatching('bloup')[0].should.equal(doc3);
+      idx.getMatching('bloup')[0].should.equal(doc3._id);
     });
 
   });   // ==== End of 'Update' ==== //
@@ -521,10 +515,10 @@ describe('Indexes', function () {
 
     it('Get all documents where fieldName is equal to the given value, or an empty array if no match', function () {
       var idx = new Index({ fieldName: 'tf' })
-        , doc1 = { a: 5, tf: 'hello' }
-        , doc2 = { a: 8, tf: 'world' }
-        , doc3 = { a: 2, tf: 'bloup' }
-        , doc4 = { a: 23, tf: 'world' }
+        , doc1 = { _id: 5, tf: 'hello' }
+        , doc2 = { _id: 8, tf: 'world' }
+        , doc3 = { _id: 2, tf: 'bloup' }
+        , doc4 = { _id: 23, tf: 'world' }
         ;
 
       idx.insert(doc1);
@@ -532,33 +526,33 @@ describe('Indexes', function () {
       idx.insert(doc3);
       idx.insert(doc4);
 
-      assert.deepEqual(idx.getMatching('bloup'), [doc3]);
-      assert.deepEqual(idx.getMatching('world'), [doc2, doc4]);
+      assert.deepEqual(idx.getMatching('bloup'), [doc3._id]);
+      assert.deepEqual(idx.getMatching('world'), [doc2._id, doc4._id]);
       assert.deepEqual(idx.getMatching('nope'), []);
     });
 
     it('Can get all documents for a given key in a unique index', function () {
       var idx = new Index({ fieldName: 'tf', unique: true })
-        , doc1 = { a: 5, tf: 'hello' }
-        , doc2 = { a: 8, tf: 'world' }
-        , doc3 = { a: 2, tf: 'bloup' }
+        , doc1 = { _id: 5, tf: 'hello' }
+        , doc2 = { _id: 8, tf: 'world' }
+        , doc3 = { _id: 2, tf: 'bloup' }
         ;
 
       idx.insert(doc1);
       idx.insert(doc2);
       idx.insert(doc3);
 
-      assert.deepEqual(idx.getMatching('bloup'), [doc3]);
-      assert.deepEqual(idx.getMatching('world'), [doc2]);
+      assert.deepEqual(idx.getMatching('bloup'), [doc3._id]);
+      assert.deepEqual(idx.getMatching('world'), [doc2._id]);
       assert.deepEqual(idx.getMatching('nope'), []);
     });
 
     it('Can get all documents for which a field is undefined', function () {
       var idx = new Index({ fieldName: 'tf' })
-        , doc1 = { a: 5, tf: 'hello' }
-        , doc2 = { a: 2, nottf: 'bloup' }
-        , doc3 = { a: 8, tf: 'world' }
-        , doc4 = { a: 7, nottf: 'yes' }
+        , doc1 = { _id: 5, tf: 'hello' }
+        , doc2 = { _id: 2, nottf: 'bloup' }
+        , doc3 = { _id: 8, tf: 'world' }
+        , doc4 = { _id: 7, nottf: 'yes' }
         ;
 
       idx.insert(doc1);
@@ -566,26 +560,26 @@ describe('Indexes', function () {
       idx.insert(doc3);
 
       assert.deepEqual(idx.getMatching('bloup'), []);
-      assert.deepEqual(idx.getMatching('hello'), [doc1]);
-      assert.deepEqual(idx.getMatching('world'), [doc3]);
+      assert.deepEqual(idx.getMatching('hello'), [doc1._id]);
+      assert.deepEqual(idx.getMatching('world'), [doc3._id]);
       assert.deepEqual(idx.getMatching('yes'), []);
-      assert.deepEqual(idx.getMatching(undefined), [doc2]);
+      assert.deepEqual(idx.getMatching(undefined), [doc2._id]);
 
       idx.insert(doc4);
 
       assert.deepEqual(idx.getMatching('bloup'), []);
-      assert.deepEqual(idx.getMatching('hello'), [doc1]);
-      assert.deepEqual(idx.getMatching('world'), [doc3]);
+      assert.deepEqual(idx.getMatching('hello'), [doc1._id]);
+      assert.deepEqual(idx.getMatching('world'), [doc3._id]);
       assert.deepEqual(idx.getMatching('yes'), []);
-      assert.deepEqual(idx.getMatching(undefined), [doc2, doc4]);
+      assert.deepEqual(idx.getMatching(undefined), [doc2._id, doc4._id]);
     });
 
     it('Can get all documents for which a field is null', function () {
       var idx = new Index({ fieldName: 'tf' })
-        , doc1 = { a: 5, tf: 'hello' }
-        , doc2 = { a: 2, tf: null }
-        , doc3 = { a: 8, tf: 'world' }
-        , doc4 = { a: 7, tf: null }
+        , doc1 = { _id: 5, tf: 'hello' }
+        , doc2 = { _id: 2, tf: null }
+        , doc3 = { _id: 8, tf: 'world' }
+        , doc4 = { _id: 7, tf: null }
         ;
 
       idx.insert(doc1);
@@ -593,26 +587,26 @@ describe('Indexes', function () {
       idx.insert(doc3);
 
       assert.deepEqual(idx.getMatching('bloup'), []);
-      assert.deepEqual(idx.getMatching('hello'), [doc1]);
-      assert.deepEqual(idx.getMatching('world'), [doc3]);
+      assert.deepEqual(idx.getMatching('hello'), [doc1._id]);
+      assert.deepEqual(idx.getMatching('world'), [doc3._id]);
       assert.deepEqual(idx.getMatching('yes'), []);
-      assert.deepEqual(idx.getMatching(null), [doc2]);
+      assert.deepEqual(idx.getMatching(null), [doc2._id]);
 
       idx.insert(doc4);
 
       assert.deepEqual(idx.getMatching('bloup'), []);
-      assert.deepEqual(idx.getMatching('hello'), [doc1]);
-      assert.deepEqual(idx.getMatching('world'), [doc3]);
+      assert.deepEqual(idx.getMatching('hello'), [doc1._id]);
+      assert.deepEqual(idx.getMatching('world'), [doc3._id]);
       assert.deepEqual(idx.getMatching('yes'), []);
-      assert.deepEqual(idx.getMatching(null), [doc2, doc4]);
+      assert.deepEqual(idx.getMatching(null), [doc2._id, doc4._id]);
     });
 
     it('Can get all documents for a given key in a sparse index, but not unindexed docs (= field undefined)', function () {
       var idx = new Index({ fieldName: 'tf', sparse: true })
-        , doc1 = { a: 5, tf: 'hello' }
-        , doc2 = { a: 2, nottf: 'bloup' }
-        , doc3 = { a: 8, tf: 'world' }
-        , doc4 = { a: 7, nottf: 'yes' }
+        , doc1 = { _id: 5, tf: 'hello' }
+        , doc2 = { _id: 2, nottf: 'bloup' }
+        , doc3 = { _id: 8, tf: 'world' }
+        , doc4 = { _id: 7, nottf: 'yes' }
         ;
 
       idx.insert(doc1);
@@ -621,19 +615,19 @@ describe('Indexes', function () {
       idx.insert(doc4);
 
       assert.deepEqual(idx.getMatching('bloup'), []);
-      assert.deepEqual(idx.getMatching('hello'), [doc1]);
-      assert.deepEqual(idx.getMatching('world'), [doc3]);
+      assert.deepEqual(idx.getMatching('hello'), [doc1._id]);
+      assert.deepEqual(idx.getMatching('world'), [doc3._id]);
       assert.deepEqual(idx.getMatching('yes'), []);
       assert.deepEqual(idx.getMatching(undefined), []);
     });
 
     it('Can get all documents whose key is in an array of keys', function () {
       var idx = new Index({ fieldName: 'tf' })
-        , doc1 = { a: 5, tf: 'hello' }
-        , doc2 = { a: 2, tf: 'bloup' }
-        , doc3 = { a: 8, tf: 'world' }
-        , doc4 = { a: 7, tf: 'yes' }
-        , doc5 = { a: 7, tf: 'yes' }
+        , doc1 = { _id: 5, tf: 'hello' }
+        , doc2 = { _id: 2, tf: 'bloup' }
+        , doc3 = { _id: 8, tf: 'world' }
+        , doc4 = { _id: 7, tf: 'yes' }
+        , doc5 = { _id: 7, tf: 'yes' }
         ;
 
       idx.insert(doc1);
@@ -643,19 +637,19 @@ describe('Indexes', function () {
       idx.insert(doc5);
 
       assert.deepEqual(idx.getMatching([]), []);
-      assert.deepEqual(idx.getMatching(['bloup']), [doc2]);
-      assert.deepEqual(idx.getMatching(['bloup', 'yes']), [doc2, doc4, doc5]);
-      assert.deepEqual(idx.getMatching(['hello', 'no']), [doc1]);
+      assert.deepEqual(idx.getMatching(['bloup']), [doc2._id]);
+      assert.deepEqual(idx.getMatching(['bloup', 'yes']), [doc2._id, doc4._id, doc5._id]);
+      assert.deepEqual(idx.getMatching(['hello', 'no']), [doc1._id]);
       assert.deepEqual(idx.getMatching(['nope', 'no']), []);
     });
 
     it('Can get all documents whose key is between certain bounds', function () {
-      var idx = new Index({ fieldName: 'a' })
-        , doc1 = { a: 5, tf: 'hello' }
-        , doc2 = { a: 2, tf: 'bloup' }
-        , doc3 = { a: 8, tf: 'world' }
-        , doc4 = { a: 7, tf: 'yes' }
-        , doc5 = { a: 10, tf: 'yes' }
+      var idx = new Index({ fieldName: '_id' })
+        , doc1 = { _id: 5, tf: 'hello' }
+        , doc2 = { _id: 2, tf: 'bloup' }
+        , doc3 = { _id: 8, tf: 'world' }
+        , doc4 = { _id: 7, tf: 'yes' }
+        , doc5 = { _id: 10, tf: 'yes' }
         ;
 
       idx.insert(doc1);
@@ -664,9 +658,9 @@ describe('Indexes', function () {
       idx.insert(doc4);
       idx.insert(doc5);
 
-      assert.deepEqual(idx.getBetweenBounds({ $lt: 10, $gte: 5 }), [ doc1, doc4, doc3 ]);
-      assert.deepEqual(idx.getBetweenBounds({ $lte: 8 }), [ doc2, doc1, doc4, doc3 ]);
-      assert.deepEqual(idx.getBetweenBounds({ $gt: 7 }), [ doc3, doc5 ]);
+      assert.deepEqual(idx.getBetweenBounds({ $lt: 10, $gte: 5 }), [ doc1._id, doc4._id, doc3._id ]);
+      assert.deepEqual(idx.getBetweenBounds({ $lte: 8 }), [ doc2._id, doc1._id, doc4._id, doc3._id ]);
+      assert.deepEqual(idx.getBetweenBounds({ $gt: 7 }), [ doc3._id, doc5._id ]);
     });
 
   });   // ==== End of 'Get matching documents' ==== //
@@ -753,16 +747,16 @@ describe('Indexes', function () {
 
   it('Get all elements in the index', function () {
     var idx = new Index({ fieldName: 'a' })
-      , doc1 = { a: 5, tf: 'hello' }
-      , doc2 = { a: 8, tf: 'world' }
-      , doc3 = { a: 2, tf: 'bloup' }
+      , doc1 = { a: 5, _id: 'hello' }
+      , doc2 = { a: 8, _id: 'world' }
+      , doc3 = { a: 2, _id: 'bloup' }
       ;
 
     idx.insert(doc1);
     idx.insert(doc2);
     idx.insert(doc3);
 
-    assert.deepEqual(idx.getAll(), [{ a: 2, tf: 'bloup' }, { a: 5, tf: 'hello' }, { a: 8, tf: 'world' }]);
+    assert.deepEqual(idx.getAll(), ['bloup', 'hello', 'world']);
   });
 
 

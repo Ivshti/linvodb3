@@ -1341,20 +1341,20 @@ describe('Database', function () {
               assert.isDefined(err);
 
               // No index modified
-              _.each(d.indexes, function (index) {
-                var docs = index.getAll()
-                  , d1 = _.find(docs, function (doc) { return doc._id === doc1._id })
-                  , d2 = _.find(docs, function (doc) { return doc._id === doc2._id })
-                  , d3 = _.find(docs, function (doc) { return doc._id === doc3._id })
-                  ;
+              async.each(d.indexes, function (index, cb) {
+                var docs = index.getAll();
+                async.map(docs, d.findById.bind(d), function(err, docs) {
+                  var d1 = _.find(docs, function (doc) { return doc._id === doc1._id })
+                    , d2 = _.find(docs, function (doc) { return doc._id === doc2._id })
+                    , d3 = _.find(docs, function (doc) { return doc._id === doc3._id })
+                    ;
 
-                // All changes rolled back, including those that didn't trigger an error
-                d1.a.should.equal(4);
-                d2.a.should.equal(5);
-                d3.a.should.equal('abc');
-              });
-
-              done();
+                  // All changes rolled back, including those that didn't trigger an error
+                  d1.a.should.equal(4);
+                  d2.a.should.equal(5);
+                  d3.a.should.equal('abc');
+                }, cb);
+              }, done);
             });
           });
         });
@@ -1370,17 +1370,19 @@ describe('Database', function () {
             assert.isDefined(err);
 
             // Check that no index was modified
-            _.each(d.indexes, function (index) {
-              var docs = index.getAll()
-              , d1 = _.find(docs, function (doc) { return doc._id === doc1._id })
-              , d2 = _.find(docs, function (doc) { return doc._id === doc2._id })
-              ;
+            async.each(d.indexes, function (index, cb) {
+              var docs = index.getAll();
+              async.map(docs, d.findById.bind(d), function(err, docs) {
+                var d1 = _.find(docs, function (doc) { return doc._id === doc1._id })
+                  , d2 = _.find(docs, function (doc) { return doc._id === doc2._id })
+                  ;
 
-              d1.a.should.equal(4);
-              d2.a.should.equal(5);
-            });
+                // All changes rolled back, including those that didn't trigger an error
+                d1.a.should.equal(4);
+                d2.a.should.equal(5);
+              }, cb);
+            }, done);
 
-            done();
           });
         });
       });
@@ -1827,11 +1829,11 @@ describe('Database', function () {
 
         d.insert({ a: 2, z: 'yes' }, function (err, newDoc) {
           d.indexes.z.tree.getNumberOfKeys().should.equal(1);
-          assert.deepEqual(d.indexes.z.getMatching('yes'), [newDoc]);
+          assert.deepEqual(d.indexes.z.getMatching('yes'), [newDoc._id]);
 
           d.insert({ a: 5, z: 'nope' }, function (err, newDoc) {
             d.indexes.z.tree.getNumberOfKeys().should.equal(2);
-            assert.deepEqual(d.indexes.z.getMatching('nope'), [newDoc]);
+            assert.deepEqual(d.indexes.z.getMatching('nope'), [newDoc._id]);
 
             done();
           });
@@ -1846,14 +1848,14 @@ describe('Database', function () {
         d.insert({ a: 2, z: 'yes', ya: 'indeed' }, function (err, newDoc) {
           d.indexes.z.tree.getNumberOfKeys().should.equal(1);
           d.indexes.ya.tree.getNumberOfKeys().should.equal(1);
-          assert.deepEqual(d.indexes.z.getMatching('yes'), [newDoc]);
-          assert.deepEqual(d.indexes.ya.getMatching('indeed'), [newDoc]);
+          assert.deepEqual(d.indexes.z.getMatching('yes'), [newDoc._id]);
+          assert.deepEqual(d.indexes.ya.getMatching('indeed'), [newDoc._id]);
 
           d.insert({ a: 5, z: 'nope', ya: 'sure' }, function (err, newDoc2) {
             d.indexes.z.tree.getNumberOfKeys().should.equal(2);
             d.indexes.ya.tree.getNumberOfKeys().should.equal(2);
-            assert.deepEqual(d.indexes.z.getMatching('nope'), [newDoc2]);
-            assert.deepEqual(d.indexes.ya.getMatching('sure'), [newDoc2]);
+            assert.deepEqual(d.indexes.z.getMatching('nope'), [newDoc2._id]);
+            assert.deepEqual(d.indexes.ya.getMatching('sure'), [newDoc2._id]);
 
             done();
           });
@@ -1866,11 +1868,11 @@ describe('Database', function () {
 
         d.insert({ a: 2, z: 'yes' }, function (err, newDoc) {
           d.indexes.z.tree.getNumberOfKeys().should.equal(1);
-          assert.deepEqual(d.indexes.z.getMatching('yes'), [newDoc]);
+          assert.deepEqual(d.indexes.z.getMatching('yes'), [newDoc._id]);
 
           d.insert({ a: 5, z: 'yes' }, function (err, newDoc2) {
             d.indexes.z.tree.getNumberOfKeys().should.equal(1);
-            assert.deepEqual(d.indexes.z.getMatching('yes'), [newDoc, newDoc2]);
+            assert.deepEqual(d.indexes.z.getMatching('yes'), [newDoc._id, newDoc2._id]);
 
             done();
           });
@@ -1883,7 +1885,7 @@ describe('Database', function () {
 
         d.insert({ a: 2, y: 'yes' }, function (err, newDoc) {
           d.indexes.y.tree.getNumberOfKeys().should.equal(1);
-          assert.deepEqual(d.indexes.y.getMatching('yes'), [newDoc]);
+          assert.deepEqual(d.indexes.y.getMatching('yes'), [newDoc._id]);
 
           d.insert({ a: 5, y: 'yes' }, function (err) {
             assert.isNotNull(err);
@@ -1892,10 +1894,10 @@ describe('Database', function () {
 
             // Index didn't change
             d.indexes.y.tree.getNumberOfKeys().should.equal(1);
-            assert.deepEqual(d.indexes.y.getMatching('yes'), [newDoc]);
+            assert.deepEqual(d.indexes.y.getMatching('yes'), [newDoc._id]);
 
             // Data didn't change
-            assert.deepEqual(d.getAllData(), [newDoc]);
+            assert.deepEqual(d.getAllData(), [newDoc._id]);
             d.reload(function () {
               d.find({}, function(err, docs) {
                 docs.length.should.equal(1);
@@ -1927,9 +1929,9 @@ describe('Database', function () {
             d.indexes.uni.tree.getNumberOfKeys().should.equal(1);
             d.indexes.nonu2.tree.getNumberOfKeys().should.equal(1);
 
-            assert.deepEqual(d.indexes.nonu1.getMatching('yes'), [newDoc]);
-            assert.deepEqual(d.indexes.uni.getMatching('willfail'), [newDoc]);
-            assert.deepEqual(d.indexes.nonu2.getMatching('yes2'), [newDoc]);
+            assert.deepEqual(d.indexes.nonu1.getMatching('yes'), [newDoc._id]);
+            assert.deepEqual(d.indexes.uni.getMatching('willfail'), [newDoc._id]);
+            assert.deepEqual(d.indexes.nonu2.getMatching('yes2'), [newDoc._id]);
 
             done();
           });
@@ -1942,7 +1944,7 @@ describe('Database', function () {
 
         d.insert({ a: 2, z: 'yes' }, function (err, newDoc) {
           d.indexes.zzz.tree.getNumberOfKeys().should.equal(1);
-          assert.deepEqual(d.indexes.zzz.getMatching(undefined), [newDoc]);
+          assert.deepEqual(d.indexes.zzz.getMatching(undefined), [newDoc._id]);
 
           d.insert({ a: 5, z: 'other' }, function (err) {
             err.errorType.should.equal('uniqueViolated');
@@ -2033,33 +2035,39 @@ describe('Database', function () {
         d.insert({ a: 1, b: 'hello' }, function (err, _doc1) {
           d.insert({ a: 2, b: 'si' }, function (err, _doc2) {
             d.update({ a: 1 }, { $set: { a: 456, b: 'no' } }, {}, function (err, nr) {
-              var data = d.getAllData()
-                , doc1 = _.find(data, function (doc) { return doc._id === _doc1._id; })
-                , doc2 = _.find(data, function (doc) { return doc._id === _doc2._id; })
-                ;
-
-              assert.isNull(err);
-              nr.should.equal(1);
-
-              data.length.should.equal(2);
-              assert.deepEqual(doc1, { a: 456, b: 'no', _id: _doc1._id });
-              assert.deepEqual(doc2, { a: 2, b: 'si', _id: _doc2._id });
-
-              d.update({}, { $inc: { a: 10 }, $set: { b: 'same' } }, { multi: true }, function (err, nr) {
-                var data = d.getAllData()
-                  , doc1 = _.find(data, function (doc) { return doc._id === _doc1._id; })
+              var data = d.getAllData();
+              async.map(data, d.findById.bind(d), function(err, data) {
+                var doc1 = _.find(data, function (doc) { return doc._id === _doc1._id; })
                   , doc2 = _.find(data, function (doc) { return doc._id === _doc2._id; })
                   ;
 
                 assert.isNull(err);
-                nr.should.equal(2);
+                nr.should.equal(1);
 
                 data.length.should.equal(2);
-                assert.deepEqual(doc1, { a: 466, b: 'same', _id: _doc1._id });
-                assert.deepEqual(doc2, { a: 12, b: 'same', _id: _doc2._id });
+                assert.deepEqual(doc1, { a: 456, b: 'no', _id: _doc1._id });
+                assert.deepEqual(doc2, { a: 2, b: 'si', _id: _doc2._id });
 
-                done();
+                d.update({}, { $inc: { a: 10 }, $set: { b: 'same' } }, { multi: true }, function (err, nr) {
+                  var data = d.getAllData();
+                  async.map(data, d.findById.bind(d), function(err, data) {
+
+                    var doc1 = _.find(data, function (doc) { return doc._id === _doc1._id; })
+                      , doc2 = _.find(data, function (doc) { return doc._id === _doc2._id; })
+                      ;
+
+                    assert.isNull(err);
+                    nr.should.equal(2);
+
+                    data.length.should.equal(2);
+                    assert.deepEqual(doc1, { a: 466, b: 'same', _id: _doc1._id });
+                    assert.deepEqual(doc2, { a: 12, b: 'same', _id: _doc2._id });
+
+                    done();                  
+                  });
+                });
               });
+
             });
           });
         });
@@ -2077,12 +2085,12 @@ describe('Database', function () {
               nr.should.equal(1);
 
               d.indexes.a.tree.getNumberOfKeys().should.equal(2);
-              d.indexes.a.getMatching(456)[0]._id.should.equal(doc1._id);
-              d.indexes.a.getMatching(2)[0]._id.should.equal(doc2._id);
+              d.indexes.a.getMatching(456)[0].should.equal(doc1._id);
+              d.indexes.a.getMatching(2)[0].should.equal(doc2._id);
 
               d.indexes.b.tree.getNumberOfKeys().should.equal(2);
-              d.indexes.b.getMatching('no')[0]._id.should.equal(doc1._id);
-              d.indexes.b.getMatching('si')[0]._id.should.equal(doc2._id);
+              d.indexes.b.getMatching('no')[0].should.equal(doc1._id);
+              d.indexes.b.getMatching('si')[0].should.equal(doc2._id);
 
               // The same pointers are shared between all indexes
               d.indexes.a.tree.getNumberOfKeys().should.equal(2);
@@ -2099,13 +2107,13 @@ describe('Database', function () {
                 nr.should.equal(2);
 
                 d.indexes.a.tree.getNumberOfKeys().should.equal(2);
-                d.indexes.a.getMatching(466)[0]._id.should.equal(doc1._id);
-                d.indexes.a.getMatching(12)[0]._id.should.equal(doc2._id);
+                d.indexes.a.getMatching(466)[0].should.equal(doc1._id);
+                d.indexes.a.getMatching(12)[0].should.equal(doc2._id);
 
                 d.indexes.b.tree.getNumberOfKeys().should.equal(1);
                 d.indexes.b.getMatching('same').length.should.equal(2);
-                _.pluck(d.indexes.b.getMatching('same'), '_id').should.contain(doc1._id);
-                _.pluck(d.indexes.b.getMatching('same'), '_id').should.contain(doc2._id);
+                d.indexes.b.getMatching('same').should.contain(doc1._id);
+                d.indexes.b.getMatching('same').should.contain(doc2._id);
 
                 // The same pointers are shared between all indexes
                 d.indexes.a.tree.getNumberOfKeys().should.equal(2);
@@ -2133,37 +2141,40 @@ describe('Database', function () {
             d.insert({ a: 3, b: 30, c: 300 }, function (err, _doc3) {
               // Will conflict with doc3
               d.update({ a: 2 }, { $inc: { a: 10, c: 1000 }, $set: { b: 30 } }, {}, function (err) {
-                var data = d.getAllData()
-                  , doc1 = _.find(data, function (doc) { return doc._id === _doc1._id; })
-                  , doc2 = _.find(data, function (doc) { return doc._id === _doc2._id; })
-                  , doc3 = _.find(data, function (doc) { return doc._id === _doc3._id; })
-                  ;
+                var data = d.getAllData();
+                async.map(data, d.findById.bind(d), function(er,data) {
+                  var doc1 = _.find(data, function (doc) { return doc._id === _doc1._id; })
+                    , doc2 = _.find(data, function (doc) { return doc._id === _doc2._id; })
+                    , doc3 = _.find(data, function (doc) { return doc._id === _doc3._id; })
+                    ;
 
-                err.errorType.should.equal('uniqueViolated');
+                  err.errorType.should.equal('uniqueViolated');
 
-                // Data left unchanged
-                data.length.should.equal(3);
-                assert.deepEqual(doc1, { a: 1, b: 10, c: 100, _id: _doc1._id });
-                assert.deepEqual(doc2, { a: 2, b: 20, c: 200, _id: _doc2._id });
-                assert.deepEqual(doc3, { a: 3, b: 30, c: 300, _id: _doc3._id });
+                  // Data left unchanged
+                  data.length.should.equal(3);
+                  assert.deepEqual(doc1, { a: 1, b: 10, c: 100, _id: _doc1._id });
+                  assert.deepEqual(doc2, { a: 2, b: 20, c: 200, _id: _doc2._id });
+                  assert.deepEqual(doc3, { a: 3, b: 30, c: 300, _id: _doc3._id });
 
-                // All indexes left unchanged and pointing to the same docs
-                d.indexes.a.tree.getNumberOfKeys().should.equal(3);
-                d.indexes.a.getMatching(1)[0].should.equal(doc1);
-                d.indexes.a.getMatching(2)[0].should.equal(doc2);
-                d.indexes.a.getMatching(3)[0].should.equal(doc3);
+                  // All indexes left unchanged and pointing to the same docs
+                  d.indexes.a.tree.getNumberOfKeys().should.equal(3);
+                  d.indexes.a.getMatching(1)[0].should.equal(doc1._id);
+                  d.indexes.a.getMatching(2)[0].should.equal(doc2._id);
+                  d.indexes.a.getMatching(3)[0].should.equal(doc3._id);
 
-                d.indexes.b.tree.getNumberOfKeys().should.equal(3);
-                d.indexes.b.getMatching(10)[0].should.equal(doc1);
-                d.indexes.b.getMatching(20)[0].should.equal(doc2);
-                d.indexes.b.getMatching(30)[0].should.equal(doc3);
+                  d.indexes.b.tree.getNumberOfKeys().should.equal(3);
+                  d.indexes.b.getMatching(10)[0].should.equal(doc1._id);
+                  d.indexes.b.getMatching(20)[0].should.equal(doc2._id);
+                  d.indexes.b.getMatching(30)[0].should.equal(doc3._id);
 
-                d.indexes.c.tree.getNumberOfKeys().should.equal(3);
-                d.indexes.c.getMatching(100)[0].should.equal(doc1);
-                d.indexes.c.getMatching(200)[0].should.equal(doc2);
-                d.indexes.c.getMatching(300)[0].should.equal(doc3);
+                  d.indexes.c.tree.getNumberOfKeys().should.equal(3);
+                  d.indexes.c.getMatching(100)[0].should.equal(doc1._id);
+                  d.indexes.c.getMatching(200)[0].should.equal(doc2._id);
+                  d.indexes.c.getMatching(300)[0].should.equal(doc3._id);
 
-                done();
+                  done();
+                });
+
               });
             });
           });
@@ -2180,37 +2191,38 @@ describe('Database', function () {
             d.insert({ a: 3, b: 30, c: 300 }, function (err, _doc3) {
               // Will conflict with doc3
               d.update({ a: { $in: [1, 2] } }, { $inc: { a: 10, c: 1000 }, $set: { b: 30 } }, { multi: true }, function (err) {
-                var data = d.getAllData()
-                  , doc1 = _.find(data, function (doc) { return doc._id === _doc1._id; })
-                  , doc2 = _.find(data, function (doc) { return doc._id === _doc2._id; })
-                  , doc3 = _.find(data, function (doc) { return doc._id === _doc3._id; })
-                  ;
+                async.map(d.getAllData(), d.findById.bind(d), function(er,data) {
+                  var doc1 = _.find(data, function (doc) { return doc._id === _doc1._id; })
+                    , doc2 = _.find(data, function (doc) { return doc._id === _doc2._id; })
+                    , doc3 = _.find(data, function (doc) { return doc._id === _doc3._id; })
+                    ;
 
-                err.errorType.should.equal('uniqueViolated');
+                  err.errorType.should.equal('uniqueViolated');
 
-                // Data left unchanged
-                data.length.should.equal(3);
-                assert.deepEqual(doc1, { a: 1, b: 10, c: 100, _id: _doc1._id });
-                assert.deepEqual(doc2, { a: 2, b: 20, c: 200, _id: _doc2._id });
-                assert.deepEqual(doc3, { a: 3, b: 30, c: 300, _id: _doc3._id });
+                  // Data left unchanged
+                  data.length.should.equal(3);
+                  assert.deepEqual(doc1, { a: 1, b: 10, c: 100, _id: _doc1._id });
+                  assert.deepEqual(doc2, { a: 2, b: 20, c: 200, _id: _doc2._id });
+                  assert.deepEqual(doc3, { a: 3, b: 30, c: 300, _id: _doc3._id });
 
-                // All indexes left unchanged and pointing to the same docs
-                d.indexes.a.tree.getNumberOfKeys().should.equal(3);
-                d.indexes.a.getMatching(1)[0].should.equal(doc1);
-                d.indexes.a.getMatching(2)[0].should.equal(doc2);
-                d.indexes.a.getMatching(3)[0].should.equal(doc3);
+                  // All indexes left unchanged and pointing to the same docs
+                  d.indexes.a.tree.getNumberOfKeys().should.equal(3);
+                  d.indexes.a.getMatching(1)[0].should.equal(doc1._id);
+                  d.indexes.a.getMatching(2)[0].should.equal(doc2._id);
+                  d.indexes.a.getMatching(3)[0].should.equal(doc3._id);
 
-                d.indexes.b.tree.getNumberOfKeys().should.equal(3);
-                d.indexes.b.getMatching(10)[0].should.equal(doc1);
-                d.indexes.b.getMatching(20)[0].should.equal(doc2);
-                d.indexes.b.getMatching(30)[0].should.equal(doc3);
+                  d.indexes.b.tree.getNumberOfKeys().should.equal(3);
+                  d.indexes.b.getMatching(10)[0].should.equal(doc1._id);
+                  d.indexes.b.getMatching(20)[0].should.equal(doc2._id);
+                  d.indexes.b.getMatching(30)[0].should.equal(doc3._id);
 
-                d.indexes.c.tree.getNumberOfKeys().should.equal(3);
-                d.indexes.c.getMatching(100)[0].should.equal(doc1);
-                d.indexes.c.getMatching(200)[0].should.equal(doc2);
-                d.indexes.c.getMatching(300)[0].should.equal(doc3);
+                  d.indexes.c.tree.getNumberOfKeys().should.equal(3);
+                  d.indexes.c.getMatching(100)[0].should.equal(doc1._id);
+                  d.indexes.c.getMatching(200)[0].should.equal(doc2._id);
+                  d.indexes.c.getMatching(300)[0].should.equal(doc3._id);
 
-                done();
+                  done();
+                });               
               });
             });
           });
@@ -2228,28 +2240,30 @@ describe('Database', function () {
           d.insert({ a: 2, b: 'si' }, function (err, _doc2) {
             d.insert({ a: 3, b: 'coin' }, function (err, _doc3) {
               d.remove({ a: 1 }, {}, function (err, nr) {
-                var data = d.getAllData()
-                , doc2 = _.find(data, function (doc) { return doc._id === _doc2._id; })
-                , doc3 = _.find(data, function (doc) { return doc._id === _doc3._id; })
-                ;
-
-                assert.isNull(err);
-                nr.should.equal(1);
-
-                data.length.should.equal(2);
-                assert.deepEqual(doc2, { a: 2, b: 'si', _id: _doc2._id });
-                assert.deepEqual(doc3, { a: 3, b: 'coin', _id: _doc3._id });
-
-                d.remove({ a: { $in: [2, 3] } }, { multi: true }, function (err, nr) {
-                  var data = d.getAllData()
+                async.map(d.getAllData(), d.findById.bind(d), function(er,data) {
+                  var doc2 = _.find(data, function (doc) { return doc._id === _doc2._id; })
+                  , doc3 = _.find(data, function (doc) { return doc._id === _doc3._id; })
                   ;
 
                   assert.isNull(err);
-                  nr.should.equal(2);
-                  data.length.should.equal(0);
+                  nr.should.equal(1);
 
-                  done();
+                  data.length.should.equal(2);
+                  assert.deepEqual(doc2, { a: 2, b: 'si', _id: _doc2._id });
+                  assert.deepEqual(doc3, { a: 3, b: 'coin', _id: _doc3._id });
+
+                  d.remove({ a: { $in: [2, 3] } }, { multi: true }, function (err, nr) {
+                    var data = d.getAllData()
+                    ;
+
+                    assert.isNull(err);
+                    nr.should.equal(2);
+                    data.length.should.equal(0);
+
+                    done();
+                  });
                 });
+
               });
             });
           });
@@ -2269,12 +2283,12 @@ describe('Database', function () {
                 nr.should.equal(1);
 
                 d.indexes.a.tree.getNumberOfKeys().should.equal(2);
-                d.indexes.a.getMatching(2)[0]._id.should.equal(doc2._id);
-                d.indexes.a.getMatching(3)[0]._id.should.equal(doc3._id);
+                d.indexes.a.getMatching(2)[0].should.equal(doc2._id);
+                d.indexes.a.getMatching(3)[0].should.equal(doc3._id);
 
                 d.indexes.b.tree.getNumberOfKeys().should.equal(2);
-                d.indexes.b.getMatching('si')[0]._id.should.equal(doc2._id);
-                d.indexes.b.getMatching('coin')[0]._id.should.equal(doc3._id);
+                d.indexes.b.getMatching('si')[0].should.equal(doc2._id);
+                d.indexes.b.getMatching('coin')[0].should.equal(doc3._id);
 
                 // The same pointers are shared between all indexes
                 d.indexes.a.tree.getNumberOfKeys().should.equal(2);
