@@ -837,22 +837,22 @@ describe('Cursor', function () {
     it('lock/unlock value from the stream', function (done) {
 
       Cursor.getMatchesStream(d, { name: "Kelly" }).on("data", function(d1) {
-        d1.lock();
-        var v1 = d1.val();
+        var v1 = d1.lock();
         assert.isDefined(d1.id);
         assert.isDefined(v1);
         v1.name.should.equal("Kelly");
-        d1.val().age = 29;
+        v1.age = 29;
 
         Cursor.getMatchesStream(d, { name: "Kelly" }).on("data", function(d2) {
-          d2.lock();
-          d1.val().should.equal(d2.val());
+          var v2 = d2.lock();
+          v2.should.equal(v1);
 
           d1.unlock();
           d2.unlock();
 
           Cursor.getMatchesStream(d, { name: "Kelly" }).on("data", function(d3) {
-            d3.val().should.not.equal(v1);
+            d3.lock().should.not.equal(v1);
+            d3.unlock();
             done();
           });
         });

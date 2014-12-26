@@ -1691,6 +1691,7 @@ describe('Database', function () {
 
           d.findOne({  }, function(err,doc) {
             doc.a.should.equal(6);
+            done();
           });
         });
       });
