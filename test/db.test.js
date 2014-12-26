@@ -1775,7 +1775,9 @@ describe('Database', function () {
     it('Returns an error if the query is not well formed', function (done) {
       d.insert({ hello: 'world' }, function () {
         d.remove({ $or: { hello: 'world' } }, {}, function (err, nr, upsert) {
+          assert.isNotNull(err);
           assert.isDefined(err);
+
           assert.isUndefined(nr);
           assert.isUndefined(upsert);
 
