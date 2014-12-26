@@ -248,7 +248,6 @@ describe('Database', function () {
           // Datafile only contains index definition
           //var datafileContents = document.deserialize(fs.readFileSync(testDb, 'utf8'));
           //assert.deepEqual(datafileContents, { $$indexCreated: { fieldName: 'a', unique: true } });
-
           docs.length.should.equal(0);
 
           done();
