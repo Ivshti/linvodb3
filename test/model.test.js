@@ -1201,36 +1201,6 @@ describe('Document', function () {
     });
 
 
-    describe('Comparison operator $where', function () {
-
-      it('Function should match and not match correctly', function () {
-        document.match({ a: 4}, { $where: function () { return this.a === 4; } }).should.equal(true);
-        document.match({ a: 4}, { $where: function () { return this.a === 5; } }).should.equal(false);
-      });
-
-      it('Should throw an error if the $where function is not, in fact, a function', function () {
-        (function () { document.match({ a: 4 }, { $where: 'not a function' }); }).should.throw();
-      });
-
-      it('Should throw an error if the $where function returns a non-boolean', function () {
-        (function () { document.match({ a: 4 }, { $where: function () { return 'not a boolean'; } }); }).should.throw();
-      });
-      
-      it('Should be able to do the complex matching it must be used for', function () {
-        var checkEmail = function() {
-          if (!this.firstName || !this.lastName) { return false; }
-          return this.firstName.toLowerCase() + "." + this.lastName.toLowerCase() + "@gmail.com" === this.email;
-        };
-        document.match({ firstName: "John", lastName: "Doe", email: "john.doe@gmail.com" }, { $where: checkEmail }).should.equal(true);
-        document.match({ firstName: "john", lastName: "doe", email: "john.doe@gmail.com" }, { $where: checkEmail }).should.equal(true);
-        document.match({ firstName: "Jane", lastName: "Doe", email: "john.doe@gmail.com" }, { $where: checkEmail }).should.equal(false);
-        document.match({ firstName: "John", lastName: "Deere", email: "john.doe@gmail.com" }, { $where: checkEmail }).should.equal(false);
-        document.match({ lastName: "Doe", email: "john.doe@gmail.com" }, { $where: checkEmail }).should.equal(false);
-      });
-
-    });
-
-
     describe('Array fields', function () {
 
       it('Field equality', function () {
