@@ -777,6 +777,7 @@ describe('Cursor', function () {
     // Logical operators: $or $and $not $where
     // We need to test all operators supported by getMatches
 
+    /* Maybe we can reuse that dataset? */
     beforeEach(function (done) {
       d.insert([
         { age: 27, name: "Kelly", department: "support" },
@@ -790,31 +791,6 @@ describe('Cursor', function () {
       ], function (err) {
         done();
       });
-    });
-
-    it('Exact match by one index', function (done) {
-      // Dummy find to make sure indexes are up to date
-      d.find({ }, function(err, docs) {
-        var doc1 = _.filter(docs, function(doc) { return doc.name === "Jim"; })[0];
-
-        var stream = Cursor.getMatchesStream(d, { name: "Jim" });
-        stream.on("ids", function(ids) { 
-          console.log(ids);
-
-          console.log(doc1);
-          done('Not implemented')
-        });
-      });
-    });
-
-
-    it('Querying on an un-indexed field triggers re-building indexes (auto-indexing)', function (done) {
-      done('Not implemented');
-    });
-
-    it('Auto-build a few indexes, debounce test', function (done) {
-      // Requires DB to emit events
-      done('Not implemented')    
     });
 
     it('Retrieve IDs', function (done) {
