@@ -772,7 +772,7 @@ describe('Cursor', function () {
   });   // ==== End of 'Projections' ====
 
 
-  describe('getMatches', function() {
+  describe('getMatchesStream', function() {
     // Comparison operators: $lt $lte $gt $gte $ne $in $nin $regex $exists $size 
     // Logical operators: $or $and $not $where
     // We need to test all operators supported by getMatches
@@ -793,19 +793,45 @@ describe('Cursor', function () {
       });
     });
 
-    it('Retrieve IDs', function (done) {
-      done('Not implemented')    
+    it('events ids, data, ready fire and in the proper order', function (done) {
+      var stream = Cursor.getMatchesStream(d, {});
+      var ev = [];
+      stream.on("ids", function() { ev.push("ids"); });
+      stream.on("data", function(d) { ev.push("data"); });
+      stream.on("ready", function() { 
+        ev.push("ready");
+
+        assert.deepEqual(ev,["ids", "data", "data", "data", "data", "data", "data", "data", "ready"]);
+        
+        done();
+      });
+
     });
 
-    it('Retrieve objects', function (done) {
-      done('Not implemented')
 
-    });
+    it('data events stop firing when stream is closed', function (done) {
+      var stream = Cursor.getMatchesStream(d, {});
+      var ev = [];
+      stream.on("ids", function() { ev.push("ids"); });
+      stream.on("data", function(d) { ev.push("data"); stream.close(); });
+      stream.on("ready", function() { 
+        ev.push("ready");
 
+        assert.deepEqual(ev,["ids", "data", "ready"]);
 
-    it('Close stops stream', function (done) {
-      done('Not implemented')
+        // Run another test, this time close right after .ids
+        var stream = Cursor.getMatchesStream(d, {});
+        ev = [];
+        stream.on("ids", function() { ev.push("ids"); stream.close(); });
+        stream.on("data", function(d) { ev.push("data"); });
+        stream.on("ready", function() { 
+          ev.push("ready");
 
+          assert.deepEqual(ev, ["ids", "ready"]);
+          
+          done();
+        });
+      });
     }); 
 
     it('lock/unlock value from the stream', function (done) {
