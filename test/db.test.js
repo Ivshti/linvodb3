@@ -711,6 +711,8 @@ describe('Database', function () {
 
 
     it('Can use an index to get sorted docs via compound sort', function (done) {
+      d.options.autoIndexing.should.equal(true);
+
       d.insert([
         { a: 1, b: 3 },
         { a: 12, b: 1 },
@@ -1676,6 +1678,25 @@ describe('Database', function () {
         });
       });
     });
+
+
+    it('Updates are atomic', function (done) {
+      d.insert({ a: 4 }, function (err, doc1) {
+        // With this query, candidates are always returned in the order 4, 5, 'abc' so it's always the last one which fails
+         async.parallel([
+          function(cb) { d.update({ a: { $in: [4, 5, 'abc'] } }, { $inc: { a: 1 } }, { multi: true }, cb) },
+          function(cb) { d.update({ a: { $in: [4, 5, 'abc'] } }, { $inc: { a: 1 } }, { multi: true }, cb) }     
+        ]     
+         , function (err) {
+          assert.isNull(err);
+
+          d.findOne({  }, function(err,doc) {
+            doc.a.should.equal(6);
+          });
+        });
+      });
+    });
+
 
   });   // ==== End of 'Update' ==== //
 
