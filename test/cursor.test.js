@@ -839,12 +839,14 @@ describe('Cursor', function () {
       Cursor.getMatchesStream(d, { name: "Kelly" }).on("data", function(d1) {
         d1.lock();
         var v1 = d1.val();
+        assert.isDefined(d1.id);
+        assert.isDefined(v1);
         v1.name.should.equal("Kelly");
         d1.val().age = 29;
 
         Cursor.getMatchesStream(d, { name: "Kelly" }).on("data", function(d2) {
           d2.lock();
-          v1.should.equal(d2.val());
+          d1.val().should.equal(d2.val());
 
           d1.unlock();
           d2.unlock();
