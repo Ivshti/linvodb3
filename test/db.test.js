@@ -8,6 +8,7 @@ var should = require('chai').should()
   , rimraf = require('rimraf')
 //  , document = require('../lib/document')
   , Model = require('../lib/model')
+  , Cursor = require('../lib/cursor')
   ;
 
 
@@ -338,13 +339,20 @@ describe('Database', function () {
   });   // ==== End of 'Insert' ==== //
 
 
-  describe('#getCandidates', function () {
+  describe('#getIdsForQuery', function () {
+    var getCandidates = function(query, proj, cb) {
+      var stream = Cursor.getMatchesStream(d, query);
+      stream.on("ids", function(ids) {
+        stream.close();
+        async.map(ids, d.findById.bind(d), function(err, candidates) { cb(candidates) });
+      });
+    };
 
     it('Auto-indexing works', function (done) {
       d.options.autoIndexing.should.equal(true);
 
       d.insert({ tf: 4, r: 6 }, function (err, _doc1) {
-        d.getCandidates({ r: 6, tf: 4 }, null, function(data) {
+        getCandidates({ r: 6, tf: 4 }, null, function(data) {
           assert.isDefined(d.indexes.tf);
           assert.isDefined(d.indexes.r);
           done();
@@ -357,15 +365,15 @@ describe('Database', function () {
       d.options.autoIndexing.should.equal(true);
 
       d.insert({ tf: 4, r: 6 }, function (err, _doc1) {
-        d.getCandidates({ r: 6 }, null, function(data) { });
-        setTimeout(function() { d.getCandidates({ tf: 4 }, null, function(data) { }) }, 5);
+        getCandidates({ r: 6 }, null, function(data) { });
+        setTimeout(function() { getCandidates({ tf: 4 }, null, function(data) { }) }, 5);
 
         d.once("indexesReady", function(indexes) {
           indexes.length.should.equal(2);
 
           assert.isNotNull(_.find(indexes, function(x) { return x.fieldName === "r" }));          
           assert.isNotNull(_.find(indexes, function(x) { return x.fieldName === "tf" }));
-          
+
           done();
         });
       });
@@ -377,7 +385,7 @@ describe('Database', function () {
       d.options.autoIndexing = false;
 
       d.insert({ tf: 4, r: 6 }, function (err, _doc1) {
-        d.getCandidates({ r: 6, tf: 4 }, null, function(data) {
+        getCandidates({ r: 6, tf: 4 }, null, function(data) {
           assert.isUndefined(d.indexes.tf);
           assert.isUndefined(d.indexes.r);
           done();
@@ -392,7 +400,7 @@ describe('Database', function () {
         d.insert([{ tf: 6 }, { tf: 4, an: 'dont match us' } ], function () {
           d.insert({ tf: 4, an: 'other', r: 6 }, function (err, _doc2) {
             d.insert({ tf: 9 }, function () {
-              d.getCandidates({ r: 6, tf: 4 }, null, function(data) {
+              getCandidates({ r: 6, tf: 4 }, null, function(data) {
                 var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
                   , doc2 = _.find(data, function (d) { return d._id === _doc2._id; })
                   ;
@@ -418,7 +426,7 @@ describe('Database', function () {
         { tf: 10, r: 2 },
         { tf: 3 },
       ], function (err) {
-        d.getCandidates({ r: { $exists: true } }, null, function(data) {
+        getCandidates({ r: { $exists: true } }, null, function(data) {
             data.length.should.equal(3);
             d.getCandidates({ r: { $exists: false } }, null, function(data) {
                 data.length.should.equal(1);
@@ -437,7 +445,7 @@ describe('Database', function () {
         { tf: 5, r: 6 },        
         { tf: 10, r: 10 },
       ], function (err) {
-        d.getCandidates({ r: { $exists: true, $lt: 5 } }, null, function(data) {
+        getCandidates({ r: { $exists: true, $lt: 5 } }, null, function(data) {
             data.length.should.equal(1);
             assert.deepEqual(doc, data[0]);
             done();
@@ -455,7 +463,7 @@ describe('Database', function () {
           { name: "Oscar "},
           { somethingElse: "else" }
       ], function (err) {
-        d.getCandidates({ name: { $regex: /^J/ } }, null, function(data) {
+        getCandidates({ name: { $regex: /^J/ } }, null, function(data) {
             data.length.should.equal(2);
             data.sort(function(b,a){ return a.name > b.name });
 
@@ -474,7 +482,7 @@ describe('Database', function () {
         d.insert({ tf: 5, r: 6 }, function () {
           d.insert({ tf: 4, an: 'other', r: 6 }, function (err, _doc2) {
             d.insert({ tf: 9 }, function () {
-              d.getCandidates({ tf: { $ne: 5 }, r: 6 }, null, function(data) {
+              getCandidates({ tf: { $ne: 5 }, r: 6 }, null, function(data) {
                 var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
                   , doc2 = _.find(data, function (d) { return d._id === _doc2._id; })
                   ;
@@ -499,7 +507,7 @@ describe('Database', function () {
         d.insert({ tf: 6 }, function () {
           d.insert({ tf: 4, an: 'other', r: { a: 4 } }, function (err) {
             d.insert({ tf: 9 }, function () {
-              d.getCandidates({ "r.a": 6 , tf: 4 }, null, function(data) {
+              getCandidates({ "r.a": 6 , tf: 4 }, null, function(data) {
                 var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
                   ;
 
@@ -546,7 +554,7 @@ describe('Database', function () {
           d.insert({ tf: 6 }, function (err, _doc1) {
             d.insert({ tf: 4, an: 'other' }, function (err) {
               d.insert({ tf: 9 }, function (err, _doc2) {
-                d.getCandidates({ tf: { $nin: [4, 8, 10] } },null,function(data) {
+                getCandidates({ tf: { $nin: [4, 8, 10] } },null,function(data) {
                   var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
                     , doc2 = _.find(data, function (d) { return d._id === _doc2._id; })
                     ;
@@ -571,7 +579,7 @@ describe('Database', function () {
           d.insert({ tf: [4,6,8] }, function (err, _doc2) { // matched, test with array
             d.insert({ tf: 4, an: 'other' }, function (err, _doc3) {
               d.insert({ tf: 9 }, function (err, _doc4) { // matched
-                d.getCandidates({  tf: { $lte: 9, $gte: 6 } }, null, function(data) {
+                getCandidates({  tf: { $lte: 9, $gte: 6 } }, null, function(data) {
                   var doc2 = _.find(data, function (d) { return d._id === _doc2._id; })
                     , doc4 = _.find(data, function (d) { return d._id === _doc4._id; })
                     ;
@@ -590,7 +598,7 @@ describe('Database', function () {
       });
     });
 
-  });   // ==== End of '#getCandidates' ==== //
+  });   // ==== End of '#getIdsForQuery' ==== //
 
 
   describe('Find', function () {
