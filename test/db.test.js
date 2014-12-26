@@ -731,6 +731,51 @@ describe('Database', function () {
       })
     });
 
+
+    it('Query sets _sorted/_indexed flag if completely sorted and indexed', function (done) {
+      d.insert([
+        { a: 12, b: 1 },
+        { a: 1, b: 3 },
+        { a: 5, b: 3 },
+        { a: 3, b: 2 },
+        { a: 14, b: 2 },
+        { a: 18, b: 2 },
+        { a: 9, b: 1 },
+        { b: 2 } // to check if we still match on a (a: { $exists: true } )
+      ], function() { 
+        var stream = Cursor.getMatchesStream(d, { b: { $gt: 1 }, a: { $exists: true } }, { a: 1 });
+        stream.on("ids", function(ids) {
+          ids._sorted.should.equal(true);
+          ids._indexed.should.equal(true);
+
+          done();
+        })
+      });
+    });
+
+    it('Query sets _sorted/_indexed flag if not completely sorted and indexed', function (done) {
+      d.options.autoIndexing = false;
+
+      d.insert([
+        { a: 12, b: 1 },
+        { a: 1, b: 3 },
+        { a: 5, b: 3 },
+        { a: 3, b: 2 },
+        { a: 14, b: 2 },
+        { a: 18, b: 2 },
+        { a: 9, b: 1 },
+        { b: 2 } // to check if we still match on a (a: { $exists: true } )
+      ], function() {
+        var stream = Cursor.getMatchesStream(d, { b: { $gt: 1 }, a: { $exists: true } }, { a: 1 });
+        stream.on("ids", function(ids) {
+          ids._sorted.should.equal(false);
+          ids._indexed.should.equal(false);
+
+          done();
+        })
+      });
+    });
+
   });   // ==== End of '#getIdsForQuery' ==== //
 
 
