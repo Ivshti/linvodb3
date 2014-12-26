@@ -598,6 +598,78 @@ describe('Database', function () {
       });
     });
 
+    it('Can use an index to get docs with logical operator $or', function (done) {
+      d.ensureIndex({ fieldName: 'tf' }, function (err) {
+        d.insert({ tf: 4 }, function (err) {
+          d.insert({ tf: 6 }, function (err, _doc1) {
+            d.insert({ tf: 4, an: 'other' }, function (err) {
+              d.insert({ tf: 9 }, function (err, _doc2) {
+                d.getCandidates({ $or: [ { tf: 6 }, { tf: 9 } ] },null,function(data) {
+                  var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
+                    , doc2 = _.find(data, function (d) { return d._id === _doc2._id; })
+                    ;
+
+                  data.length.should.equal(2);
+                  assert.deepEqual(doc1, { _id: doc1._id, tf: 6 });
+                  assert.deepEqual(doc2, { _id: doc2._id, tf: 9 });
+
+                  done();
+                })
+
+              });
+            });
+          });
+        });
+      });
+    });
+
+
+    it('Can use an index to get docs with logical operator $and', function (done) {
+      d.ensureIndex({ fieldName: 'tf' }, function (err) {
+        d.insert({ tf: 4 }, function (err) {
+          d.insert({ tf: 6 }, function (err) {
+            d.insert({ tf: 4, an: 'other' }, function (err, _doc1) {
+              d.insert({ tf: 9 }, function (err) {
+                d.getCandidates({ $and: [ { tf: 4 }, { an: 'other' } ] },null,function(data) {
+                  var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
+                    ;
+
+                  data.length.should.equal(1);
+                  assert.deepEqual(doc1, { _id: doc1._id, tf: 4, an: 'other' });
+
+                  done();
+                })
+
+              });
+            });
+          });
+        });
+      });
+    });
+
+
+    it('Can use an index to get docs with logical operator $not, with nesting operators', function (done) {
+      d.ensureIndex({ fieldName: 'tf' }, function (err) {
+        d.insert({ tf: 6 }, function (err, _doc1) {
+          d.insert({ tf: 4, an: 'other' }, function (err) {
+            d.insert({ tf: 9 }, function (err, _doc2) {
+              d.getCandidates({ $not: { $and: [ { tf: 4 }, { an: 'other' } ] } },null,function(data) {
+                  var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
+                    , doc2 = _.find(data, function (d) { return d._id === _doc2._id; })
+                    ;
+
+                  data.length.should.equal(2);
+                  assert.deepEqual(doc1, { _id: doc1._id, tf: 6 });
+                  assert.deepEqual(doc2, { _id: doc2._id, tf: 9 });
+
+                  done();
+              })
+
+            });
+          });
+        });
+      });
+    });
   });   // ==== End of '#getIdsForQuery' ==== //
 
 
