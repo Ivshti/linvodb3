@@ -866,9 +866,3 @@ describe('Cursor', function () {
 });
 
 
-
-
-
-
-
-
