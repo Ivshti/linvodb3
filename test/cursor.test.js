@@ -834,6 +834,24 @@ describe('Cursor', function () {
       });
     }); 
 
+
+    it('intercept the default trigger, call it manually', function (done) {
+      var stream = Cursor.getMatchesStream(d, {});
+      stream.removeListener("ids", stream.trigger);
+
+      var ev = [];
+      stream.on("ids", function(ids) { ev.push("ids"); stream.trigger(ids.slice(0,3)) });
+      stream.on("data", function(d) { ev.push("data"); });
+      stream.on("ready", function() { 
+        ev.push("ready");
+
+        assert.deepEqual(ev,["ids", "data", "data", "data", "ready"]);
+
+        done();
+      });
+    }); 
+
+
     it('lock/unlock value from the stream', function (done) {
 
       Cursor.getMatchesStream(d, { name: "Kelly" }).on("data", function(d1) {
