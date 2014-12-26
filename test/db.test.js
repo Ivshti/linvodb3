@@ -671,8 +671,26 @@ describe('Database', function () {
       });
     });
 
-
     it('Can use an index to get sorted docs', function (done) {
+      d.insert([
+        { a: 12, b: 1 },
+        { a: 1, b: 3 },
+        { a: 5, b: 3 },
+        { a: 3, b: 2 },
+        { a: 14, b: 2 },
+        { a: 18, b: 2 },
+        { a: 9, b: 1 },
+        { b: 2 } // to check if we still match on a (a: { $exists: true } )
+      ], function() { 
+        getCandidates({ }, { a: 1 }, function(data) {
+          data.length.should.equal(8);
+          assert.deepEqual(_.pluck(data, "a"), [ undefined, 1, 3, 5, 9, 12, 14, 18 ]);
+          done();
+        });
+      })
+    });
+
+    it('Can use an index to get sorted docs with query', function (done) {
       d.insert([
         { a: 12, b: 1 },
         { a: 1, b: 3 },
@@ -689,7 +707,29 @@ describe('Database', function () {
           done();
         });
       })
-    });    
+    });
+
+
+    it('Can use an index to get sorted docs via compound sort', function (done) {
+      d.insert([
+        { a: 1, b: 3 },
+        { a: 12, b: 1 },
+        { a: 5, b: 3 },
+        { a: 3, b: 2 },
+        { a: 18, b: 2 },
+        { a: 14, b: 2 },
+        { a: 9, b: 1 },
+        { b: 2 } // to check if we still match on a (a: { $exists: true } )
+      ], function() { 
+        getCandidates({ a: { $gt: 1 } }, { b: 1, a: 1 }, function(data) {
+          data.length.should.equal(6);
+          assert.deepEqual(_.pluck(data, "b"), [ 1,1,2,2,2,3 ]);
+          assert.deepEqual(_.pluck(data, "a"), [ 9,12,  3,14,8,  3 ]);
+          done();
+        });
+      })
+    });
+
   });   // ==== End of '#getIdsForQuery' ==== //
 
 
