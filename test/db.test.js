@@ -340,8 +340,8 @@ describe('Database', function () {
 
 
   describe('#getIdsForQuery', function () {
-    var getCandidates = function(query, proj, cb) {
-      var stream = Cursor.getMatchesStream(d, query);
+    var getCandidates = function(query, sort, cb) {
+      var stream = Cursor.getMatchesStream(d, query, sort);
       stream.on("ids", function(ids) {
         stream.close();
         async.map(ids, d.findById.bind(d), function(err, candidates) { cb(candidates) });
@@ -428,7 +428,7 @@ describe('Database', function () {
       ], function (err) {
         getCandidates({ r: { $exists: true } }, null, function(data) {
             data.length.should.equal(3);
-            d.getCandidates({ r: { $exists: false } }, null, function(data) {
+            getCandidates({ r: { $exists: false } }, null, function(data) {
                 data.length.should.equal(1);
                 done();
             });
@@ -529,7 +529,7 @@ describe('Database', function () {
           d.insert({ tf: 6 }, function (err, _doc1) {
             d.insert({ tf: 4, an: 'other' }, function (err) {
               d.insert({ tf: 9 }, function (err, _doc2) {
-                d.getCandidates({ tf: { $in: [6, 9, 5] } },null,function(data) {
+                getCandidates({ tf: { $in: [6, 9, 5] } },null,function(data) {
                   var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
                     , doc2 = _.find(data, function (d) { return d._id === _doc2._id; })
                     ;
@@ -604,7 +604,7 @@ describe('Database', function () {
           d.insert({ tf: 6 }, function (err, _doc1) {
             d.insert({ tf: 4, an: 'other' }, function (err) {
               d.insert({ tf: 9 }, function (err, _doc2) {
-                d.getCandidates({ $or: [ { tf: 6 }, { tf: 9 } ] },null,function(data) {
+                getCandidates({ $or: [ { tf: 6 }, { tf: 9 } ] },null,function(data) {
                   var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
                     , doc2 = _.find(data, function (d) { return d._id === _doc2._id; })
                     ;
@@ -630,7 +630,7 @@ describe('Database', function () {
           d.insert({ tf: 6 }, function (err) {
             d.insert({ tf: 4, an: 'other' }, function (err, _doc1) {
               d.insert({ tf: 9 }, function (err) {
-                d.getCandidates({ $and: [ { tf: 4 }, { an: 'other' } ] },null,function(data) {
+                getCandidates({ $and: [ { tf: 4 }, { an: 'other' } ] },null,function(data) {
                   var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
                     ;
 
@@ -653,7 +653,7 @@ describe('Database', function () {
         d.insert({ tf: 6 }, function (err, _doc1) {
           d.insert({ tf: 4, an: 'other' }, function (err) {
             d.insert({ tf: 9 }, function (err, _doc2) {
-              d.getCandidates({ $not: { $and: [ { tf: 4 }, { an: 'other' } ] } },null,function(data) {
+              getCandidates({ $not: { $and: [ { tf: 4 }, { an: 'other' } ] } },null,function(data) {
                   var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
                     , doc2 = _.find(data, function (d) { return d._id === _doc2._id; })
                     ;
@@ -670,6 +670,26 @@ describe('Database', function () {
         });
       });
     });
+
+
+    it('Can use an index to get sorted docs', function (done) {
+      d.insert([
+        { a: 12, b: 1 },
+        { a: 1, b: 3 },
+        { a: 5, b: 3 },
+        { a: 3, b: 2 },
+        { a: 14, b: 2 },
+        { a: 18, b: 2 },
+        { a: 9, b: 1 },
+        { b: 2 } // to check if we still match on a (a: { $exists: true } )
+      ], function() { 
+        getCandidates({ b: { $gt: 1 }, a: { $exists: true } }, { a: 1 }, function(data) {
+          data.length.should.equal(5);
+          assert.deepEqual(_.pluck(data, "a"), [ 1,3,5,14,18 ]);
+          done();
+        });
+      })
+    });    
   });   // ==== End of '#getIdsForQuery' ==== //
 
 
