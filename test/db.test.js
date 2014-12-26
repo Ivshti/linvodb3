@@ -353,6 +353,25 @@ describe('Database', function () {
     });
 
 
+    it('Auto-indexing is debounced', function (done) {
+      d.options.autoIndexing.should.equal(true);
+
+      d.insert({ tf: 4, r: 6 }, function (err, _doc1) {
+        d.getCandidates({ r: 6 }, null, function(data) { });
+        setTimeout(function() { d.getCandidates({ tf: 4 }, null, function(data) { }) }, 5);
+
+        d.once("indexesReady", function(indexes) {
+          indexes.length.should.equal(2);
+
+          assert.isNotNull(_.find(indexes, function(x) { return x.fieldName === "r" }));          
+          assert.isNotNull(_.find(indexes, function(x) { return x.fieldName === "tf" }));
+          
+          done();
+        });
+      });
+    });
+
+
     it('Auto-indexing can be disabled', function (done) {
       d.options.autoIndexing.should.equal(true);
       d.options.autoIndexing = false;
