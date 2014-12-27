@@ -1,3 +1,3 @@
-var Datastore = require('./lib/datastore');
+var Model = require('./lib/model');
 
-module.exports = Datastore;
+module.exports = Model;
