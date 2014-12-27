@@ -394,6 +394,8 @@ describe('Database', function () {
 
 
     it('Can use a compound index to get docs with a basic match', function (done) {
+      return done(new Error("not implemented - TODO"));
+
       d.options.autoIndexing = false;
       d.ensureIndex({ fieldName: ['tf', 'tg'] }, function (err) {
         d.insert({ tf: 4, tg: 0, foo: 1 }, function () {
@@ -734,6 +736,8 @@ describe('Database', function () {
 
 
     it('Can use an index to get sorted docs via compound sort', function (done) {
+      return done(new Error("not implemented - TODO"));
+
       d.options.autoIndexing.should.equal(true);
 
       d.insert([
