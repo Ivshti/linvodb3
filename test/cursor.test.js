@@ -723,7 +723,28 @@ describe('Cursor', function () {
       });
     });
 
+    it('functions are applied in order - filter, sort, (limit/skip), map, reduce', function (done) {
+      var cursor = new Cursor(d, {});
+      cursor.sort({ age: 1 });   // For easier finding
 
+      cursor.filter(function(x) { return x.age < 30 });
+
+      cursor.map(function(x, i, all) {
+        all.length.should.equal(2);  // Make sure filter has executed; that means we cannot test limit/skip here though
+        return x.age;
+      });
+
+      cursor.reduce(function(a, b) {
+        return a+b;
+      });
+
+      cursor.exec(function (err, res) {
+        assert.isNull(err);
+        res.should.equal(28);
+
+        done();
+      });
+    });
   });   // ==== End of 'Map' ====
 
 
