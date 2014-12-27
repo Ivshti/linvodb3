@@ -42,13 +42,14 @@ describe('Schema', function () {
       d = new Model("testDb", { 
         name: { index: true, unique: true, sparse: true },
         age: { index: true },
-        department: { index: false }
+        department: { index: false },
+        address: { city: { index: true } }
       }, { filename: testDb });
 
       d.insert([
-        { age: 27, name: "Kelly", department: "support" },
-        { age: 31, name: "Jim", department: "sales" },
-        { age: 33, name: "Dwight", department: "sales" }, 
+        { age: 27, name: "Kelly", department: "support", address: { city: "Scranton" } },
+        { age: 31, name: "Jim", department: "sales", address: { city: "Scranton" } },
+        { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } }, 
         { age: 45, name: "Michael", department: "management" },
         { age: 46, name: "Toby", department: "hr" },
         { age: 45, name: "Phyllis", department: "sales" },
@@ -63,6 +64,8 @@ describe('Schema', function () {
       assert.isDefined(d.indexes.name);
       assert.isDefined(d.indexes.age);
       assert.isUndefined(d.indexes.department);
+      
+      assert.isDefined(d.indexes["address.city"]);
 
       d.indexes.name.sparse.should.equal(true);
       d.indexes.name.unique.should.equal(true);
@@ -81,6 +84,7 @@ describe('Schema', function () {
 
       done();
     });
+
 
   });
 
