@@ -148,7 +148,7 @@ describe('Cursor', function () {
         done();
       });
     });
-
+    
     it('With a limit and a skip and method chaining', function (done) {
       var cursor = new Cursor(d);
       cursor.limit(4).skip(3);   // Only way to know that the right number of results was skipped is if limit + skip > number of results
@@ -160,6 +160,18 @@ describe('Cursor', function () {
       });
     });
 
+    it('With a limit and a sorter function', function (done) {
+      var cursor = new Cursor(d);
+      cursor.sort(function(a,b){return a.age-b.age}).limit(3);
+      cursor.exec(function (err, docs) {
+        assert.isNull(err);
+
+        docs.length.should.equal(3);
+        assert.deepEqual(_.pluck(docs, "age"), [5,23,52]);
+        // No way to predict which results are returned of course ...
+        done();
+      });
+    });
   });   // ===== End of 'Without sorting' =====
 
 
