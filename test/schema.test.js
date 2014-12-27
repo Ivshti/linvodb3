@@ -163,7 +163,20 @@ describe('Schema', function () {
     });
 
     it("model instance has a working .remove", function(done) {
-      done(new Error("not implemented"))
+      d.findOne({ name: "Dwight" }, function(err,doc) {
+        assert.isNull(err);
+        assert.isDefined(doc);
+
+        doc.remove(function(err) {
+          assert.isNull(err);
+          d.findOne({ _id: doc._id }, function(err, doc1) {
+            assert.isNull(err);
+            assert.isNull(doc1);
+
+            done();
+          });
+        })
+      });
     });
 
     it("model instance has a working .update", function(done) {
