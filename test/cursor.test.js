@@ -679,7 +679,7 @@ describe('Cursor', function () {
   });   // ===== End of 'Sorting' =====
 
   
-  describe('Map', function () {
+  describe('Map / Reduce', function () {
     var doc1, doc2, doc3, doc4, doc0;
 
 
@@ -703,7 +703,7 @@ describe('Cursor', function () {
       });
     });
 
-    it('map test', function (done) {
+    it('basic map test', function (done) {
       var cursor = new Cursor(d, {});
       cursor.sort({ age: 1 });   // For easier finding
 
@@ -729,9 +729,57 @@ describe('Cursor', function () {
 
       cursor.filter(function(x) { return x.age < 30 });
 
+      var mapCalled = 0;
       cursor.map(function(x, i, all) {
-        all.length.should.equal(2);  // Make sure filter has executed; that means we cannot test limit/skip here though
+        mapCalled++;
         return x.age;
+      });
+
+      cursor.reduce(function(a, b) {
+        return a+b;
+      });
+
+      cursor.exec(function (err, res) {
+        assert.isNull(err);
+        res.should.equal(28);
+        mapCalled.should.equal(2);  // Make sure filter has executed when we ran map
+
+        done();
+      });
+    });
+
+
+    it('functions are applied in order - (filter), sort, limit/skip, map, reduce', function (done) {
+      var cursor = new Cursor(d, {});
+      cursor.sort({ age: 1 });   // For easier finding
+      cursor.limit(2).skip(1);
+
+      var mapCalled = 0;
+      cursor.map(function(x) {
+        mapCalled++;
+        return x.age;
+      });
+
+      cursor.reduce(function(a, b) {
+        return a+b;
+      });
+
+      cursor.exec(function (err, res) {
+        assert.isNull(err);
+        res.should.equal(75);
+
+        mapCalled.should.equal(2);  // Make sure filter has executed when we ran map
+
+        done();
+      });
+    });  
+
+    it('map/reduce only mode', function (done) {
+      var cursor = new Cursor(d, {});
+
+      cursor.map(function(x, i) {
+        if (x.age < 30) return x.age;
+        return 0;
       });
 
       cursor.reduce(function(a, b) {
@@ -745,7 +793,28 @@ describe('Cursor', function () {
         done();
       });
     });
-  });   // ==== End of 'Map' ====
+
+
+    it('reduce - initial value', function (done) {
+      var cursor = new Cursor(d, {});
+
+      cursor.map(function(x, i) {
+        if (x.age < 30) return x.age;
+        return 0;
+      });
+
+      cursor.reduce(function(a, b) {
+        return a+b;
+      }, 2);
+
+      cursor.exec(function (err, res) {
+        assert.isNull(err);
+        res.should.equal(30);
+
+        done();
+      });
+    });
+  });   // ==== End of 'Map / Reduce' ====
 
 
   describe('getMatchesStream', function() {
