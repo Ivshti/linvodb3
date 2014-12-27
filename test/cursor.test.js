@@ -679,7 +679,7 @@ describe('Cursor', function () {
   });   // ===== End of 'Sorting' =====
 
   
-  describe('Projections', function () {
+  describe('Map', function () {
     var doc1, doc2, doc3, doc4, doc0;
 
 
@@ -703,103 +703,28 @@ describe('Cursor', function () {
       });
     });
 
-    it('Takes all results if no projection or empty object given', function (done) {
+    it('map test', function (done) {
       var cursor = new Cursor(d, {});
       cursor.sort({ age: 1 });   // For easier finding
+
+      cursor.map(function(x) { 
+        return _.pick(x, "age", "name")
+      });
       cursor.exec(function (err, docs) {
         assert.isNull(err);
         docs.length.should.equal(5);
-        assert.deepEqual(docs[0], doc0);
-        assert.deepEqual(docs[1], doc3);
-        assert.deepEqual(docs[2], doc2);
-        assert.deepEqual(docs[3], doc1);
-        assert.deepEqual(docs[4], doc4);
+        assert.deepEqual(docs[0], { age: 5, name: 'Jo' });
+        assert.deepEqual(docs[1], { age: 23, name: 'LM' });
+        assert.deepEqual(docs[2], { age: 52, name: 'Grafitti' });
+        assert.deepEqual(docs[3], { age: 57, name: 'Louis' });
+        assert.deepEqual(docs[4], { age: 89 });   // No problems if one field to take doesn't exist
 
-        cursor.projection({});
-        cursor.exec(function (err, docs) {
-          assert.isNull(err);
-          docs.length.should.equal(5);
-          assert.deepEqual(docs[0], doc0);
-          assert.deepEqual(docs[1], doc3);
-          assert.deepEqual(docs[2], doc2);
-          assert.deepEqual(docs[3], doc1);
-          assert.deepEqual(docs[4], doc4);
-
-          done();
-        });
-      });
-    });
-
-    it('Can take only the expected fields', function (done) {
-      var cursor = new Cursor(d, {});
-      cursor.sort({ age: 1 });   // For easier finding
-      cursor.projection({ age: 1, name: 1 });
-      cursor.exec(function (err, docs) {
-        assert.isNull(err);
-        docs.length.should.equal(5);
-        // Takes the _id by default
-        assert.deepEqual(docs[0], { age: 5, name: 'Jo', _id: doc0._id });
-        assert.deepEqual(docs[1], { age: 23, name: 'LM', _id: doc3._id });
-        assert.deepEqual(docs[2], { age: 52, name: 'Grafitti', _id: doc2._id });
-        assert.deepEqual(docs[3], { age: 57, name: 'Louis', _id: doc1._id });
-        assert.deepEqual(docs[4], { age: 89, _id: doc4._id });   // No problems if one field to take doesn't exist
-
-        cursor.projection({ age: 1, name: 1, _id: 0 });
-        cursor.exec(function (err, docs) {
-          assert.isNull(err);
-          docs.length.should.equal(5);
-          assert.deepEqual(docs[0], { age: 5, name: 'Jo' });
-          assert.deepEqual(docs[1], { age: 23, name: 'LM' });
-          assert.deepEqual(docs[2], { age: 52, name: 'Grafitti' });
-          assert.deepEqual(docs[3], { age: 57, name: 'Louis' });
-          assert.deepEqual(docs[4], { age: 89 });   // No problems if one field to take doesn't exist
-
-          done();
-        });
-      });
-    });
-
-    it('Can omit only the expected fields', function (done) {
-      var cursor = new Cursor(d, {});
-      cursor.sort({ age: 1 });   // For easier finding
-      cursor.projection({ age: 0, name: 0 });
-      cursor.exec(function (err, docs) {
-        assert.isNull(err);
-        docs.length.should.equal(5);
-        // Takes the _id by default
-        assert.deepEqual(docs[0], { planet: 'B', _id: doc0._id });
-        assert.deepEqual(docs[1], { planet: 'S', _id: doc3._id });
-        assert.deepEqual(docs[2], { planet: 'C', _id: doc2._id });
-        assert.deepEqual(docs[3], { planet: 'R', _id: doc1._id });
-        assert.deepEqual(docs[4], { planet: 'Earth', _id: doc4._id });
-
-        cursor.projection({ age: 0, name: 0, _id: 0 });
-        cursor.exec(function (err, docs) {
-          assert.isNull(err);
-          docs.length.should.equal(5);
-          assert.deepEqual(docs[0], { planet: 'B' });
-          assert.deepEqual(docs[1], { planet: 'S' });
-          assert.deepEqual(docs[2], { planet: 'C' });
-          assert.deepEqual(docs[3], { planet: 'R' });
-          assert.deepEqual(docs[4], { planet: 'Earth' });
-
-          done();
-        });
-      });
-    });
-
-    it('Cannot use both modes except for _id', function (done) {
-      var cursor = new Cursor(d, {});
-      cursor.sort({ age: 1 });   // For easier finding
-      cursor.projection({ age: 1, name: 0 });
-      cursor.exec(function (err, docs) {
-        assert.isNotNull(err);
-        assert.isUndefined(docs);
         done();
       });
     });
 
-  });   // ==== End of 'Projections' ====
+
+  });   // ==== End of 'Map' ====
 
 
   describe('getMatchesStream', function() {

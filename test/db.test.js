@@ -1051,68 +1051,6 @@ describe('Database', function () {
       });
     });
     
-    /*
-    it('Can use projections in find, normal or cursor way', function (done) {
-      d.insert({ a: 2, hello: 'world' }, function (err, doc0) {
-        d.insert({ a: 24, hello: 'earth' }, function (err, doc1) {
-          d.find({ a: 2 }, { a: 0, _id: 0 }, function (err, docs) {
-            assert.isNull(err);
-            docs.length.should.equal(1);
-            assert.deepEqual(docs[0], { hello: 'world' });
-
-            d.find({ a: 2 }, { a: 0, _id: 0 }).exec(function (err, docs) {
-              assert.isNull(err);
-              docs.length.should.equal(1);
-              assert.deepEqual(docs[0], { hello: 'world' });
-
-              // Can't use both modes at once if not _id
-              d.find({ a: 2 }, { a: 0, hello: 1 }, function (err, docs) {
-                assert.isNotNull(err);
-                assert.isUndefined(docs);
-
-                d.find({ a: 2 }, { a: 0, hello: 1 }).exec(function (err, docs) {
-                  assert.isNotNull(err);
-                  assert.isUndefined(docs);
-
-                  done();
-                });
-              });
-            });
-          });
-        });
-      });
-    });
-
-    it('Can use projections in findOne, normal or cursor way', function (done) {
-      d.insert({ a: 2, hello: 'world' }, function (err, doc0) {
-        d.insert({ a: 24, hello: 'earth' }, function (err, doc1) {
-          d.findOne({ a: 2 }, { a: 0, _id: 0 }, function (err, doc) {
-            assert.isNull(err);
-            assert.deepEqual(doc, { hello: 'world' });
-
-            d.findOne({ a: 2 }, { a: 0, _id: 0 }).exec(function (err, doc) {
-              assert.isNull(err);
-              assert.deepEqual(doc, { hello: 'world' });
-
-              // Can't use both modes at once if not _id
-              d.findOne({ a: 2 }, { a: 0, hello: 1 }, function (err, doc) {
-                assert.isNotNull(err);
-                assert.isUndefined(doc);
-
-                d.findOne({ a: 2 }, { a: 0, hello: 1 }).exec(function (err, doc) {
-                  assert.isNotNull(err);
-                  assert.isUndefined(doc);
-
-                  done();
-                });
-              });
-            });
-          });
-        });
-      });
-    });
-    */
-
   });   // ==== End of 'Find' ==== //
 
   describe('Count', function() {
