@@ -39,6 +39,12 @@ describe('Schema', function () {
   describe('General behavior', function() {
     /* Maybe we can reuse that dataset? */
     beforeEach(function (done) {
+      d = new Model("testDb", { 
+        name: { index: true, unique: true, sparse: true },
+        age: { index: true },
+        department: { index: false }
+      }, { filename: testDb });
+
       d.insert([
         { age: 27, name: "Kelly", department: "support" },
         { age: 31, name: "Jim", department: "sales" },
@@ -54,7 +60,14 @@ describe('Schema', function () {
     });
 
     it("Create indexes specified in schema", function(done) {
-      done(new Error("not implemented"))
+      assert.isDefined(d.indexes.name);
+      assert.isDefined(d.indexes.age);
+      assert.isUndefined(d.indexes.department);
+
+      d.indexes.name.sparse.should.equal(true);
+      d.indexes.name.unique.should.equal(true);
+
+      done();
     });
 
   });
@@ -68,7 +81,7 @@ describe('Schema', function () {
     it("strict validation - remove other keys", function(done) {
       done(new Error("not implemented"))
     });
-    
+
   });
     
 
