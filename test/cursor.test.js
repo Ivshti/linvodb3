@@ -140,6 +140,15 @@ describe('Cursor', function () {
       });
     });
 
+    it('With a filter', function (done) {
+      var cursor = new Cursor(d);
+      cursor.filter(function(x) { return x.age > 50 }).count(function (err, c) {
+        assert.isNull(err);
+        c.should.equal(3);
+        done();
+      });
+    });
+
     it('With a limit and a skip and method chaining', function (done) {
       var cursor = new Cursor(d);
       cursor.limit(4).skip(3);   // Only way to know that the right number of results was skipped is if limit + skip > number of results
