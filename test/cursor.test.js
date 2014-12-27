@@ -762,11 +762,11 @@ describe('Cursor', function () {
 
       cursor.reduce(function(a, b) {
         return a+b;
-      });
+      }, 5);
 
       cursor.exec(function (err, res) {
         assert.isNull(err);
-        res.should.equal(75);
+        res.should.equal(80);
 
         mapCalled.should.equal(2);  // Make sure filter has executed when we ran map
 
