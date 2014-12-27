@@ -90,10 +90,6 @@ describe('Schema', function () {
       done(new Error("not implemented"))
     });
 
-    it("strict validation - remove other keys", function(done) {
-      done(new Error("not implemented"))
-    });
-
   });
     
 
