@@ -184,9 +184,8 @@ describe('Schema', function () {
         assert.isNull(err);
         assert.isDefined(doc);
 
-        doc.update({ $inc: { age: 1 } }, function(err, doc1) {
+        doc.update({ $inc: { age: 1 } }, function(err, c, doc1) {
           assert.isNull(err);
-          console.log(doc1.age, doc.age);
           (doc1.age == doc.age+1).should.equal(true);
           done();
         })
