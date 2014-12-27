@@ -341,8 +341,24 @@ describe('Database', function () {
       d.find({}, function (err, docs) {
         docs.length.should.equal(0);
 
-        d.save({  }, function() {
+        d.save({ a: 5 }, function(err, doc) {
+          assert.isNull(err);
+          assert.isDefined(doc._id);
 
+          d.findOne({ _id: doc._id }, function(err, doc1) {
+
+            assert.isNull(err);
+            assert.isDefined(doc1._id);
+            doc1._id.should.equal(doc._id);
+
+            d.save({ _id: doc1._id, a: 6 }, function(err, doc2) {
+              assert.isNull(err);
+              assert.isDefined(doc2._id);
+              doc2._id.should.equal(doc._id);
+              doc2.a.should.equal(6);
+              done();
+            });
+          });
         });
       });
     });
