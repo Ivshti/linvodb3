@@ -93,6 +93,47 @@ describe('Schema', function () {
   });
     
 
+
+  describe('Model instance', function() {
+    // TODO: also check dot notation for indexes on this test
+    beforeEach(function (done) {
+      d = new Model("testDb", { 
+        name: { index: true, unique: true, sparse: true },
+        age: { index: true },
+        department: { index: false }
+      }, { filename: testDb });
+
+      d.insert([
+        { age: 27, name: "Kelly", department: "support" },
+        { age: 31, name: "Jim", department: "sales" },
+        { age: 33, name: "Dwight", department: "sales" }, 
+        { age: 45, name: "Michael", department: "management" },
+        { age: 23, name: "Ryan", department: "sales" },
+
+      ], function (err) {
+        done();
+      });
+    });
+
+    it("model instance has a working .save", function(done) {
+      d.findOne({ name: "Dwight"}, function(err, doc) {
+        assert.isDefined(doc);
+        doc.name.should.equal("Dwight");
+
+        console.log(doc.save())
+        done(new Error("not implemented"))
+
+      });
+    });
+
+    it("model instance has a working .remove", function(done) {
+      done(new Error("not implemented"))
+    });
+
+    it("model instance has a working .update", function(done) {
+      done(new Error("not implemented"))
+    });
+  });
 });
 
 
