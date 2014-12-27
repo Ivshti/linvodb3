@@ -115,6 +115,16 @@ describe('Schema', function () {
       });
     });
 
+    it("model instance construct", function(done) {
+      var doc = new d({ name: "andy", age: 11 });
+      (doc instanceof d).should.equal(true);
+      
+      var doc1 = new d(doc);
+      (doc1 instanceof d).should.equal(true);
+
+      done();
+    });
+
     it("model instance .save - update object", function(done) {
       d.findOne({ name: "Dwight"}, function(err, doc) {
         assert.isDefined(doc);
@@ -136,18 +146,18 @@ describe('Schema', function () {
     });
 
     it("model instance .save - new object", function(done) {
-      d.findOne({ name: "Dwight"}, function(err, doc) {
-        assert.isDefined(doc);
-        doc.name.should.equal("Dwight");
+      var doc = new d({ name: "Big Tuna", age: 10, department: "sales" });
+      doc.save(function(err, doc1) {
+        assert.isNull(err);
+        assert.isDefined(doc1);
 
-        doc.name = "Dwaine";
-        doc.save(function(err, doc1) {
-          assert.isNotNull(err);
-          doc1.name.should.equal("Dwaine");
-
-          console.log(doc1);
+        d.findOne({ _id: doc1._id }, function(err, doc2) {
+          assert.isNull(err);
+          doc2.name.should.equal(doc1.name);
+          done();
         });
       });
+
     });
 
     it("model instance has a working .remove", function(done) {
