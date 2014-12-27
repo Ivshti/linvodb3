@@ -115,14 +115,38 @@ describe('Schema', function () {
       });
     });
 
-    it("model instance has a working .save", function(done) {
+    it("model instance .save - update object", function(done) {
       d.findOne({ name: "Dwight"}, function(err, doc) {
         assert.isDefined(doc);
         doc.name.should.equal("Dwight");
 
-        console.log(doc.save())
-        done(new Error("not implemented"))
+        doc.name = "Dwaine";
+        doc.save(function(err, doc1) {
+          assert.isNull(err);
+          doc1.name.should.equal("Dwaine");
 
+          d.findOne({ _id: doc1._id }, function(err, doc2) {
+            assert.isNull(err);
+            doc2.name.should.equal(doc1.name);
+            done();
+          });
+
+        });
+      });
+    });
+
+    it("model instance .save - new object", function(done) {
+      d.findOne({ name: "Dwight"}, function(err, doc) {
+        assert.isDefined(doc);
+        doc.name.should.equal("Dwight");
+
+        doc.name = "Dwaine";
+        doc.save(function(err, doc1) {
+          assert.isNotNull(err);
+          doc1.name.should.equal("Dwaine");
+
+          console.log(doc1);
+        });
       });
     });
 
