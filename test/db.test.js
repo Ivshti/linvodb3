@@ -392,6 +392,30 @@ describe('Database', function () {
       });
     });
 
+
+    it('Can use a compound index to get docs with a basic match', function (done) {
+      d.options.autoIndexing = false;
+      d.ensureIndex({ fieldName: ['tf', 'tg'] }, function (err) {
+        d.insert({ tf: 4, tg: 0, foo: 1 }, function () {
+          d.insert({ tf: 6, tg: 0, foo: 2 }, function () {
+            d.insert({ tf: 4, tg: 1, foo: 3 }, function (err, _doc1) {
+              d.insert({ tf: 6, tg: 1, foo: 4 }, function () {
+                getCandidates({ tf: 4, tg: 1 }, null, function(data) {
+                  var doc1 = _.find(data, function (d) { return d._id === _doc1._id; })
+                    ;
+
+                  data.length.should.equal(1);
+                  assert.deepEqual(doc1, { _id: doc1._id, tf: 4, tg: 1, foo: 3 });
+
+                  done();
+                })
+              });
+            });
+          });
+        });
+      });
+    });
+
     it('Can use an index to get docs with a basic match on two indexes', function (done) {
       d.options.autoIndexing.should.equal(true);
 
