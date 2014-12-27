@@ -36,8 +36,8 @@ describe('Schema', function () {
     ], done);
   });
 
-  describe('General behavior', function() {
-    /* Maybe we can reuse that dataset? */
+  describe('Indexing', function() {
+    // TODO: also check dot notation for indexes on this test
     beforeEach(function (done) {
       d = new Model("testDb", { 
         name: { index: true, unique: true, sparse: true },
@@ -59,13 +59,25 @@ describe('Schema', function () {
       });
     });
 
-    it("Create indexes specified in schema", function(done) {
+    it("Create indexes specified in schema, auto-indexing does not override them", function(done) {
       assert.isDefined(d.indexes.name);
       assert.isDefined(d.indexes.age);
       assert.isUndefined(d.indexes.department);
 
       d.indexes.name.sparse.should.equal(true);
       d.indexes.name.unique.should.equal(true);
+
+      d.find({ name: "Dwight" }, function(err, docs) {
+        assert.isNull(err);
+
+        docs.length.should.equal(1);
+        docs[0].name.should.equal("Dwight");
+
+        d.indexes.name.sparse.should.equal(true);
+        d.indexes.name.unique.should.equal(true);
+
+        done();
+      });
 
       done();
     });
