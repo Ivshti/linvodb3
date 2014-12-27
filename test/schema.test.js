@@ -180,7 +180,17 @@ describe('Schema', function () {
     });
 
     it("model instance has a working .update", function(done) {
-      done(new Error("not implemented"))
+      d.findOne({ name: "Dwight" }, function(err,doc) {
+        assert.isNull(err);
+        assert.isDefined(doc);
+
+        doc.update({ $inc: { age: 1 } }, function(err, doc1) {
+          assert.isNull(err);
+          console.log(doc1.age, doc.age);
+          (doc1.age == doc.age+1).should.equal(true);
+          done();
+        })
+      });
     });
 
 
