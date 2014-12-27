@@ -112,6 +112,7 @@ describe('Database', function () {
       });
     });
 
+
     it('Can insert multiple documents in the database', function (done) {
       d.find({}, function (err, docs) {
         docs.length.should.equal(0);
@@ -333,6 +334,17 @@ describe('Database', function () {
           }
         });
       });      
+    });
+
+
+    it('Use .save for inserting a document, then updating', function (done) {
+      d.find({}, function (err, docs) {
+        docs.length.should.equal(0);
+
+        d.save({  }, function() {
+
+        });
+      });
     });
 
   });   // ==== End of 'Insert' ==== //
@@ -1304,8 +1316,13 @@ describe('Database', function () {
         });
       }
       , function (cb) {   // Test with query that doesn't match anything
-        d.update({ somedata: 'again' }, { newDoc: 'yes' }, { multi: false }, function (err, n) {
+        d.update({ somedata: 'again' }, { newDoc: 'yes' }, { multi: false }, function (err, n, doc) {
           assert.isNull(err);
+          
+          // Test if update returns first updated doc
+          assert.isDefined(doc);
+          doc.newDoc.should.equal('yes');
+
           n.should.equal(1);
           return cb();
         });
