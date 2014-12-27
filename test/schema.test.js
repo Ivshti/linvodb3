@@ -127,6 +127,8 @@ describe('Schema', function () {
 
     it("model instance .save - update object", function(done) {
       d.findOne({ name: "Dwight"}, function(err, doc) {
+        doc.constructor.name.should.equal("Document");
+
         assert.isDefined(doc);
         doc.name.should.equal("Dwight");
 
@@ -167,7 +169,32 @@ describe('Schema', function () {
     it("model instance has a working .update", function(done) {
       done(new Error("not implemented"))
     });
-  });
+
+
+
+    it("Model.find returns model instance", function(done) {
+      d.findOne({}, function(err, doc) {
+        doc.constructor.name.should.equal("Document");
+        done();
+      });
+    });
+
+    it("Model.update returns model instance", function(done) {
+      d.update({}, { $inc: { age: 1 } }, function(err, n, doc) {
+        doc.constructor.name.should.equal("Document");
+        done();
+      });
+    });
+
+    it("Model.insert returns model instance", function(done) {
+      d.insert({ name: "New guy" }, function(err, doc) {
+        doc.constructor.name.should.equal("Document");
+        done();
+      });
+    });
+  }); // End of Model Instance
+
+
 });
 
 
