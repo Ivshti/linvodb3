@@ -272,14 +272,16 @@ describe('Schema', function () {
 
         setTimeout(function()  {
           doc.save(function(err, doc1) {
-            assert.isNull(err);
+            d.find({ _id: doc1._id }, function(err,doc2) {
+              assert.isNull(err);
 
-            (doc1._ctime == doc._ctime).should.equal(true);
-            (doc1._mtime != doc._mtime).should.equal(true);
+              (doc2._ctime == doc._ctime).should.equal(true);
+              (doc2._mtime != doc._mtime).should.equal(true);
 
-            util.isDate(doc1._ctime).should.equal(true);
-            util.isDate(doc1._mtime).should.equal(true);
-            done();
+              util.isDate(doc2._ctime).should.equal(true);
+              util.isDate(doc2._mtime).should.equal(true);
+              done();
+            });
           });
         }, 100);
 
