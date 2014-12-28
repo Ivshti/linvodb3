@@ -91,7 +91,21 @@ describe('Schema', function () {
 
   describe('Validation', function() {
     it("basic type validation", function(done) {
-      done(new Error("not implemented"))
+      d = new Model("testDb", { 
+        name: { index: true, unique: true, sparse: true },
+        age: { index: true, type: "number" },
+        department: { index: false },
+        address: { city: { index: true } }
+      }, { filename: testDb });
+
+      var doc = new d({ name: "Kelly", age: 27, department: "support", address: { city: "Scranon" } });
+      assert.equal(doc.age, 27);
+      doc.age = 28;
+      assert.equal(doc.age, 28);
+      doc.age = "bullshit";
+      assert.equal(doc.age, 28);
+
+      done();
     });
 
   });
