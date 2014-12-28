@@ -260,7 +260,8 @@ describe('Schema', function () {
     });
   }); // End of Model Instance
 
-
+  
+  // TODO: move this to db.test.js
   describe('Events', function() {
     it("use pre-action events to set _ctime and _mtime", function(done) {
       
