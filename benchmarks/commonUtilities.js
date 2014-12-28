@@ -5,8 +5,7 @@
 var customUtils = require('../lib/customUtils')
   , fs = require('fs')
   , path = require('path')
-  , Datastore = require('../lib/datastore')
-  , Persistence = require('../lib/persistence')
+  , Datastore = require('../lib/model')
   , executeAsap   // process.nextTick or setImmediate depending on your Node version
   ;
 
@@ -39,7 +38,7 @@ module.exports.getConfiguration = function (benchDb) {
   console.log(program.inMemory ? "Use an in-memory datastore" : "Use a persistent datastore");
   console.log("----------------------------");
 
-  d = new Datastore({ filename: benchDb
+  d = new Datastore("test", { filename: benchDb
                     , inMemoryOnly: program.inMemory
                     });
 
@@ -51,13 +50,7 @@ module.exports.getConfiguration = function (benchDb) {
  * Ensure the workspace exists and the db datafile is empty
  */
 module.exports.prepareDb = function (filename, cb) {
-  Persistence.ensureDirectoryExists(path.dirname(filename), function () {
-    fs.exists(filename, function (exists) {
-      if (exists) {
-        fs.unlink(filename, cb);
-      } else { return cb(); }
-    });
-  });
+  cb();
 };
 
 

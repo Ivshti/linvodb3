@@ -1,10 +1,10 @@
-var Datastore = require('../lib/datastore')
+var Datastore = require('../lib/model')
   , benchDb = 'workspace/insert.bench.db'
   , async = require('async')
   , commonUtilities = require('./commonUtilities')
   , execTime = require('exec-time')
   , profiler = new execTime('INSERT BENCH')
-  , d = new Datastore(benchDb)
+  , d = new Datastore("test",{ filename: benchDb })
   , program = require('commander')
   , n
   ;
@@ -23,7 +23,7 @@ console.log("----------------------------");
 async.waterfall([
   async.apply(commonUtilities.prepareDb, benchDb)
 , function (cb) {
-    d.loadDatabase(function (err) {
+    d.reload(function (err) {
       if (err) { return cb(err); }
       cb();
     });

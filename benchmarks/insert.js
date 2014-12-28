@@ -1,4 +1,4 @@
-var Datastore = require('../lib/datastore')
+var Datastore = require('../lib/model')
   , benchDb = 'workspace/insert.bench.db'
   , async = require('async')
   , execTime = require('exec-time')
@@ -12,7 +12,7 @@ var Datastore = require('../lib/datastore')
 async.waterfall([
   async.apply(commonUtilities.prepareDb, benchDb)
 , function (cb) {
-    d.loadDatabase(function (err) {
+    d.reload(function (err) {
       if (err) { return cb(err); }
       if (config.program.withIndex) {
         d.ensureIndex({ fieldName: 'docNumber' });
