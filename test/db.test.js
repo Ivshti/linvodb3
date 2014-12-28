@@ -493,11 +493,12 @@ describe('Database', function () {
     it('Can use an index to get docs with multiple operators ($lt and $exists)', function (done) {
       var doc;
       d.insert([
-        doc = { tf: 4, r: 2 },
+        { tf: 4, r: 2 },
         { tf: 3 },
         { tf: 5, r: 6 },        
         { tf: 10, r: 10 },
-      ], function (err) {
+      ], function (err, docs) {
+        doc = docs;
         getCandidates({ r: { $exists: true, $lt: 5 } }, null, function(data) {
             data.length.should.equal(1);
             assert.deepEqual(doc, data[0]);
@@ -510,12 +511,13 @@ describe('Database', function () {
     it('Can use an index to get docs with $regex', function (done) {
       var doc1, doc2;
       d.insert([
-          doc1 = { name: "Jim" },
-          doc2 = { name: "Jan" },
+          doc1 = new d({ name: "Jim" }),
+          doc2 = new d({ name: "Jan" }),
           { name: "Dwight" },
           { name: "Oscar "},
           { somethingElse: "else" }
-      ], function (err) {
+      ], function (err, docs) {
+
         getCandidates({ name: { $regex: /^J/ } }, null, function(data) {
             data.length.should.equal(2);
             data.sort(function(b,a){ return a.name > b.name });
