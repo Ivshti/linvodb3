@@ -1,6 +1,7 @@
 var should = require('chai').should()
   , assert = require('chai').assert
   , testDb = 'workspace/test3.db'
+  , util = require('util')
   , fs = require('fs')
   , path = require('path')
   , _ = require('lodash')
@@ -258,6 +259,35 @@ describe('Schema', function () {
       });
     });
   }); // End of Model Instance
+
+
+  describe('Built-in properties', function() {
+    it("_ctime and _mtime", function(done) {
+      new d({ name: "Jan", age: 32 }).save(function(err, doc){
+        assert.isNull(err);
+
+
+        util.isDate(doc._ctime).should.equal(true);
+        util.isDate(doc._mtime).should.equal(true);
+
+        setTimeout(function()  {
+          doc.save(function(err, doc1) {
+            assert.isNull(err);
+
+            (doc1._ctime == doc._ctime).should.equal(true);
+            (doc1._mtime != doc._mtime).should.equal(true);
+
+            util.isDate(doc1._ctime).should.equal(true);
+            util.isDate(doc1._mtime).should.equal(true);
+            done();
+          });
+        }, 100);
+
+      });
+    })
+
+
+  }); // End of built-in properties
 
 
 });
