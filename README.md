@@ -1,28 +1,13 @@
-# NeDB (Node embedded database)
+# Linvo DB
 
-<img src="http://i.imgur.com/GdeQBmc.png" style="width: 25%; height: 25%; float: left;">
+![Linvo Logo](https://launchrock-assets.s3.amazonaws.com/logo-files/8FZQMF2G_1388280616887.png)
 
-**Embedded persistent database for Node.js, written in Javascript, with no dependency** (except npm
-modules of course). You can **think of it as a SQLite for Node.js projects**, which
-can be used with a simple `require` statement. The API is a subset of MongoDB's. You can use it as a persistent or an in-memory only datastore.
-
-NeDB is not intended to be a replacement of large-scale databases such as MongoDB! Its goal is to provide you with a clean and easy way to query data and persist it to disk, for web applications that do not need lots of concurrent connections, for example a <a href="https://github.com/louischatriot/braindead-ci" target="_blank">continuous integration and deployment server</a> and desktop applications built with <a href="https://github.com/rogerwang/node-webkit" target="_blank">Node Webkit</a>.
-
-NeDB was benchmarked against the popular client-side database <a href="http://www.taffydb.com/" target="_blank">TaffyDB</a> and <a href="https://github.com/louischatriot/taffydb-benchmark" target="_blank">NeDB is much, much faster</a>. That's why there is now <a href="#browser-version">a browser version</a>, which can also provide persistence.
-
-Check the <a href="https://github.com/louischatriot/nedb/wiki/Change-log" target="_blank">change log in the wiki</a> if you think nedb doesn't behave as the documentation describes! Most of the issues I get are due to non-latest version NeDBs.
-
-## Support NeDB development
-No time to <a href="#help-out">help out</a>? You can support NeDB development by sending money or bitcoins!
-
-Money: [![Donate to author](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=louis%2echatriot%40gmail%2ecom&lc=US&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHostedGuest)
-
-Bitcoin address: 1dDZLnWpBbodPiN8sizzYrgaz5iahFyb1
+**Embedded database for Node.js/node-webkit with a Mongoose-like API and schema support, using LevelUP for persistence.** 
 
 ## Installation, tests
-Module name on npm is `nedb`.
+Module name on npm is `linvodb3`.
 ```javascript
-npm install nedb --save   // Put latest version in your package.json
+npm install linvodb3 --save   // Put latest version in your package.json
 
 npm test   // You'll need the dev dependencies to test it
 ```
@@ -37,9 +22,8 @@ It's a subset of MongoDB's API (the most used operations). The current API will 
   * <a href="#basic-querying">Basic Querying</a>
   * <a href="#operators-lt-lte-gt-gte-in-nin-ne-exists-regex">Operators ($lt, $lte, $gt, $gte, $in, $nin, $ne, $exists, $regex)</a>
   * <a href="#array-fields">Array fields</a>
-  * <a href="#logical-operators-or-and-not-where">Logical operators $or, $and, $not, $where</a>
+  * <a href="#logical-operators-or-and-not-where">Logical operators $or, $and, $not</a>
   * <a href="#sorting-and-paginating">Sorting and paginating</a>
-  * <a href="#projections">Projections</a>
 * <a href="#counting-documents">Counting documents</a>
 * <a href="#updating-documents">Updating documents</a>
 * <a href="#removing-documents">Removing documents</a>
@@ -154,13 +138,11 @@ db.insert([{ a: 5 }, { a: 42 }, { a: 5 }], function (err) {
 ```
 
 ### Finding documents
-Use `find` to look for multiple documents matching you query, or `findOne` to look for one specific document. You can select documents based on field equality or use comparison operators (`$lt`, `$lte`, `$gt`, `$gte`, `$in`, `$nin`, `$ne`). You can also use logical operators `$or`, `$and`, `$not` and `$where`. See below for the syntax.
+Use `find` to look for multiple documents matching you query, or `findOne` to look for one specific document. You can select documents based on field equality or use comparison operators (`$lt`, `$lte`, `$gt`, `$gte`, `$in`, `$nin`, `$ne`). You can also use logical operators `$or`, `$and` and `$not`. See below for the syntax.
 
 You can use regular expressions in two ways: in basic querying in place of a string, or with the `$regex` operator.
 
 You can sort and paginate results using the cursor API (see below).
-
-You can use standard projections to restrict the fields to appear in the results (see below).
 
 #### Basic querying
 Basic querying means are looking for documents whose fields match the ones you specify. You can use regular expression to match strings.
@@ -264,19 +246,9 @@ db.find({ planet: { $regex: /ar/, $nin: ['Jupiter', 'Earth'] } }, function (err,
 ```
 
 #### Array fields
-When a field in a document is an array, NeDB first tries to see if there is an array-specific comparison function (for now there is only `$size`) being used
-and tries it first. If there isn't, the query is treated as a query on every element and there is a match if at least one element matches.
+When a field in a document is an array the query is treated as a query on every element and there is a match if at least one element matches.
 
 ```javascript
-// Using an array-specific comparison function
-// Note: you can't use nested comparison functions, e.g. { $size: { $lt: 5 } } will throw an error
-db.find({ satellites: { $size: 2 } }, function (err, docs) {
-  // docs contains Mars
-});
-
-db.find({ satellites: { $size: 1 } }, function (err, docs) {
-  // docs is empty
-});
 
 // If a document's field is an array, matching it means matching any element of the array
 db.find({ satellites: 'Phobos' }, function (err, docs) {
@@ -294,12 +266,11 @@ db.find({ satellites: { $in: ['Moon', 'Deimos'] } }, function (err, docs) {
 });
 ```
 
-#### Logical operators $or, $and, $not, $where
+#### Logical operators $or, $and, $not
 You can combine queries using logical operators:  
 
 * For `$or` and `$and`, the syntax is `{ $op: [query1, query2, ...] }`.
 * For `$not`, the syntax is `{ $not: query }`
-* For `$where`, the syntax is `{ $where: function () { /* object is "this", return a boolean */ } }`
 
 ```javascript
 db.find({ $or: [{ planet: 'Earth' }, { planet: 'Mars' }] }, function (err, docs) {
@@ -308,10 +279,6 @@ db.find({ $or: [{ planet: 'Earth' }, { planet: 'Mars' }] }, function (err, docs)
 
 db.find({ $not: { planet: 'Earth' } }, function (err, docs) {
   // docs contains Mars, Jupiter, Omicron Persei 8
-});
-
-db.find({ $where: function () { return Object.keys(this) > 6; } }, function (err, docs) {
-  // docs with more than 6 properties
 });
 
 // You can mix normal queries, comparison queries and logical operators
@@ -345,40 +312,6 @@ db.find({ system: 'solar' }).sort({ planet: -1 }).exec(function (err, docs) {
 db.find({}).sort({ firstField: 1, secondField: -1 }) ...   // You understand how this works!
 ```
 
-#### Projections
-You can give `find` and `findOne` an optional second argument, `projections`. The syntax is the same as MongoDB: `{ a: 1, b: 1 }` to return only the `a` and `b` fields, `{ a: 0, b: 0 }` to omit these two fields. You cannot use both modes at the time, except for `_id` which is by default always returned and which you can choose to omit.
-
-```javascript
-// Same database as above
-
-// Keeping only the given fields
-db.find({ planet: 'Mars' }, { planet: 1, system: 1 }, function (err, docs) {
-  // docs is [{ planet: 'Mars', system: 'solar', _id: 'id1' }]
-});
-
-// Keeping only the given fields but removing _id
-db.find({ planet: 'Mars' }, { planet: 1, system: 1, _id: 0 }, function (err, docs) {
-  // docs is [{ planet: 'Mars', system: 'solar' }]
-});
-
-// Omitting only the given fields and removing _id
-db.find({ planet: 'Mars' }, { planet: 0, system: 0, _id: 0 }, function (err, docs) {
-  // docs is [{ inhabited: false, satellites: ['Phobos', 'Deimos'] }]
-});
-
-// Failure: using both modes at the same time
-db.find({ planet: 'Mars' }, { planet: 0, system: 1 }, function (err, docs) {
-  // err is the error message, docs is undefined
-});
-
-// You can also use it in a Cursor way but this syntax is not compatible with MongoDB
-// If upstream compatibility is important don't use this method
-db.find({ planet: 'Mars' }).projection({ planet: 1, system: 1 }).exec(function (err, docs) {
-  // docs is [{ planet: 'Mars', system: 'solar', _id: 'id1' }]
-});
-```
-
-
 
 ### Counting documents
 You can use `count` to count documents. It has the same syntax as `find`. For example:
@@ -393,7 +326,17 @@ db.count({ system: 'solar' }, function (err, count) {
 db.count({}, function (err, count) {
   // count equals to 4
 });
+
+// Count all documents in the datastore via cursor
+db.find({}).count(function (err, count) {
+  // count equals to 4
 ```
+
+
+### Map/Reduce
+
+
+### Events
 
 
 ### Updating documents
@@ -577,32 +520,6 @@ db.removeIndex('somefield', function (err) {
 **Note:** the `ensureIndex` function creates the index synchronously, so it's best to use it at application startup. It's quite fast so it doesn't increase startup time much (35 ms for a collection containing 10,000 documents).
 
 
-## Browser version
-As of v0.8.0, you can use NeDB in the browser! You can find it and its minified version in the repository, in the `browser-version/out` directory. You only need to require `nedb.js` or `nedb.min.js` in your HTML file and the global object `Nedb` can be used right away, with the same API as the server version:
-
-```
-<script src="nedb.min.js"></script>
-<script>
-  var db = new Nedb();   // Create an in-memory only datastore
-  
-  db.insert({ planet: 'Earth' });
-  db.insert({ planet: 'Mars' });
-
-  db.find({}, function (err, docs) {
-    // docs contains the two planets Earth and Mars
-  });
-</script>
-```
-
-It has been tested and is compatible with Chrome, Safari, Firefox, IE 10, IE 9. Please open an issue if you need compatibility with IE 8/IE 7, I think it will need some work and am not sure it is needed, since most complex webapplications - the ones that would need NeDB - only work on modern browsers anyway. To launch the tests, simply open the file `browser-version/test/index.html` in a browser and you'll see the results of the tests for this browser.
-
-If you fork and modify nedb, you can build the browser version from the sources, the build script is `browser-version/build.js`.
-
-As of v0.11, NeDB is also persistent on the browser. To use this, simply create the collection with the `filename` option which will be the name of the `localStorage` variable storing data. Persistence should work on all browsers where NeDB works. Also, keep in mind that `localStorage` has size constraints, so it's probably a good idea to set recurring compaction every 2-5 minutes to save on space if your client app needs a lot of updates and deletes. See <a href="#compacting-the-database">database compaction</a> for more details on the append-only format used by NeDB.
-
-**Browser persistence is still young! It has been tested on most major browsers but please report any bugs you find**
-
-
 ## Performance
 ### Speed
 NeDB is not intended to be a replacement of large-scale databases such as MongoDB, and as such was not designed for speed. That said, it is still pretty fast on the expected datasets, especially if you use indexing. On my machine (3 years old, no SSD), with a collection containing 10,000 documents, with indexing:  
@@ -612,27 +529,6 @@ NeDB is not intended to be a replacement of large-scale databases such as MongoD
 * Remove: **6,620 ops/s**  
 
 You can run the simple benchmarks I use by executing the scripts in the `benchmarks` folder. Run them with the `--help` flag to see how they work.
-
-### Memory footprint
-A copy of the whole database is kept in memory. This is not much on the
-expected kind of datasets (20MB for 10,000 2KB documents). If requested, I'll introduce an
-option to not use this cache to decrease memory footprint (at the cost
-of a lower speed).
-
-
-## Use in other services
-* <a href="https://github.com/louischatriot/connect-nedb-session"
-  target="_blank">connect-nedb-session</a> is a session store for
-Connect and Express, backed by nedb
-* If you mostly use NeDB for logging purposes and don't want the memory footprint of your application to grow too large, you can use <a href="https://github.com/louischatriot/nedb-logger" target="_blank">NeDB Logger</a> to insert documents in a NeDB-readable database
-* If you've outgrown NeDB, switching to MongoDB won't be too hard as it is the same API. Use <a href="https://github.com/louischatriot/nedb-to-mongodb" target="_blank">this utility</a> to transfer the data from a NeDB database to a MongoDB collection
-
-
-## Help out
-Issues reporting and pull requests are always appreciated. For issues, make sure to always include a code snippet and describe the expected vs actual behavior. If you send a pull request, make sure to stick to NeDB's coding style and always test all the code you submit. You can look at the current tests to see how to do it
-
-### Bitcoins
-You don't have time? You can support NeDB by sending bitcoins to this adress: 
 
 
 ## License 
