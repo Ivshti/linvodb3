@@ -101,10 +101,23 @@ describe('Schema', function () {
       var doc = new d({ name: "Kelly", age: 27, department: "support", address: { city: "Scranon" } });
       assert.equal(doc.age, 27);
       doc.age = 28;
-      assert.equal(doc.age, 28);
+      (doc.age===28).should.equal(true);
       doc.age = "bullshit";
-      assert.equal(doc.age, 28);
+      (doc.age===28).should.equal(true);
 
+      done();
+    });
+
+    it("type validation on constructing", function(done) {
+      d = new Model("testDb", { 
+        name: { index: true, unique: true, sparse: true },
+        age: { index: true, type: "number" },
+        department: { index: false },
+        address: { city: { index: true } }
+      }, { filename: testDb });
+
+      var doc = new d({ name: "Kelly", department: "support", address: { city: "Scranon" }, age: "28" });
+      (doc.age === 28).should.equal(true);
       done();
     });
 
@@ -117,7 +130,7 @@ describe('Schema', function () {
       }, { filename: testDb });
 
       var doc = new d({ name: "Kelly", department: "support", address: { city: "Scranon" } });
-      assert.equal(doc.age, 0);
+      (doc.age===0).should.equal(true);
       done();
     });
   }); // End of Validation
