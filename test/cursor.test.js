@@ -866,6 +866,8 @@ describe('Cursor', function () {
 
         // Run another test, this time close right after .ids
         var stream = Cursor.getMatchesStream(d, {});
+        stream.on("error", function(e) { done(e) });
+
         ev = [];
         stream.on("ids", function() { ev.push("ids"); stream.close(); });
         stream.on("data", function(d) { ev.push("data"); });
@@ -882,6 +884,7 @@ describe('Cursor', function () {
 
     it('intercept the default trigger, call it manually', function (done) {
       var stream = Cursor.getMatchesStream(d, {});
+      stream.on("error", function(e) { done(e) });
       stream.removeListener("ids", stream.trigger);
 
       var ev = [];

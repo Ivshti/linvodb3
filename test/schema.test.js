@@ -86,7 +86,7 @@ describe('Schema', function () {
     });
 
 
-  });
+  });  // End of Indexing
 
 
   describe('Validation', function() {
@@ -108,7 +108,19 @@ describe('Schema', function () {
       done();
     });
 
-  });
+    it("default value", function(done) {
+      d = new Model("testDb", { 
+        name: { index: true, unique: true, sparse: true },
+        age: { index: true, type: "number" },
+        department: { index: false },
+        address: { city: { index: true } }
+      }, { filename: testDb });
+
+      var doc = new d({ name: "Kelly", department: "support", address: { city: "Scranon" } });
+      assert.equal(doc.age, 0);
+      done();
+    });
+  }); // End of Validation
     
 
 
