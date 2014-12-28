@@ -261,25 +261,29 @@ describe('Schema', function () {
   }); // End of Model Instance
 
 
-  describe('Built-in properties', function() {
-    it("_ctime and _mtime", function(done) {
+  describe('Events', function() {
+    it("use pre-action events to set _ctime and _mtime", function(done) {
+      
+      d.on("insert", function(doc) { doc._ctime = new Date() });
+      d.on("update", function(doc) { doc._mtime = new Date() });
+
       new d({ name: "Jan", age: 32 }).save(function(err, doc){
         assert.isNull(err);
-
 
         util.isDate(doc._ctime).should.equal(true);
         util.isDate(doc._mtime).should.equal(true);
 
         setTimeout(function()  {
           doc.save(function(err, doc1) {
-            d.find({ _id: doc1._id }, function(err,doc2) {
+            d.findOne({ _id: doc1._id }, function(err,doc2) {
               assert.isNull(err);
-
-              (doc2._ctime == doc._ctime).should.equal(true);
-              (doc2._mtime != doc._mtime).should.equal(true);
 
               util.isDate(doc2._ctime).should.equal(true);
               util.isDate(doc2._mtime).should.equal(true);
+
+              assert.isTrue(doc2._ctime.getTime() == doc._ctime.getTime());
+              assert.isTrue(doc2._mtime.getTime() != doc._mtime.getTime());
+
               done();
             });
           });
@@ -289,7 +293,7 @@ describe('Schema', function () {
     })
 
 
-  }); // End of built-in properties
+  }); // End of Events
 
 
 });
