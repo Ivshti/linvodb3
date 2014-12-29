@@ -263,7 +263,7 @@ describe('Schema', function () {
   
   // TODO: move this to db.test.js
   describe('Events', function() {
-    it("use pre-action events to set _ctime and _mtime", function(done) {
+    it("use pre-action events to set _ctime and _mtime & test remove", function(done) {
       
       d.on("insert", function(doc) { doc._ctime = new Date() });
       d.on("save", function(doc) { doc._mtime = new Date() });
@@ -285,14 +285,32 @@ describe('Schema', function () {
               assert.isTrue(doc2._ctime.getTime() == doc._ctime.getTime());
               assert.isTrue(doc2._mtime.getTime() != doc._mtime.getTime());
 
-              done();
+              d.on("remove", function(id) { if (id == doc1._id) done() });
+              doc2.remove();
             });
           });
-        }, 100);
+        }, 50);
 
       });
-    })
+    }); 
 
+
+    it("test inserted/updated/removed events", function(done) {
+      var doc;
+      d.on("inserted", function(docs) { docs[0].name.should.equal("Jan") });
+      d.on("removed", function(ids) { ids[0].should.equal(doc._id) });
+      d.on("updated", function(docs) { docs[0]._id.should.equal(doc._id)  });
+
+      new d(doc = { name: "Jan", age: 32 }).save(function(err, d){
+        assert.isNull(err);
+        doc = d;
+        
+        doc.age = 33;
+        d.save(function() {
+          done();
+        });
+      });
+    });
 
   }); // End of Events
 
