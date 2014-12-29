@@ -285,7 +285,7 @@ describe('Schema', function () {
               assert.isTrue(doc2._ctime.getTime() == doc._ctime.getTime());
               assert.isTrue(doc2._mtime.getTime() != doc._mtime.getTime());
 
-              d.on("remove", function(id) { if (id == doc1._id) done() });
+              d.on("remove", function(doc) { if (doc._id == doc1._id) done() });
               doc2.remove();
             });
           });

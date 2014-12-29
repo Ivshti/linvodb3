@@ -478,7 +478,7 @@ db.remove({ system: 'solar' }, { multi: true }, function (err, numRemoved) {
 // Hook-like
 db.on('save', function(doc) { }) // Will be called before saving a document - no matter if using save, insert or update methods. You can modify the document in this event, it's essentially a hook
 db.on('insert', function(doc) { }) // Will be called before saving a new document - again, no matter if using save/insert/update methods. You can modify the document in this event
-db.on('remove', function(id) { }) // Before removing a document; called with the ID of the doc
+db.on('remove', function(doc) { }) // Before removing a document; called with the document about to be removed
 
 // After operation is complete
 db.on('inserted', function(docs) { }) // Called after inserting new documents is complete; docs is an array of documents
