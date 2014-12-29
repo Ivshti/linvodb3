@@ -2,7 +2,7 @@ var Index = require('../lib/indexes')
   , customUtils = require('../lib/customUtils')
   , should = require('chai').should()
   , assert = require('chai').assert
-  , _ = require('underscore')
+  , _ = require('lodash/dist/lodash.underscore')
   , async = require('async')
   , model = require('../lib/document')
   ;
