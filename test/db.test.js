@@ -14,6 +14,12 @@ var should = require('chai').should()
 
 describe('Database', function () {
   var d;
+  
+  function remove_ids(docs){
+    docs.forEach(function(d){
+      delete d._id;
+    });
+  }
 
   beforeEach(function (done) {
     async.waterfall([
@@ -363,6 +369,53 @@ describe('Database', function () {
       });
     });
 
+    
+    describe('Events', function () {
+
+      describe('when a document is inserted', function () {
+        it('Emits the inserted event with the inserted doc', function (done) {
+          d.on('inserted', function (docs) {
+            remove_ids(docs);
+            docs.should.eql([{ a: 1 }]);            
+            done();
+          });
+          d.insert({ a: 1 }, function (err, doc) {
+            if (err) throw err;
+          });
+        });
+      });
+
+      describe('when multiple documents are inserted', function () {
+        it('Emits the inserted event with the inserted docs', function (done) {
+          d.on('inserted', function (docs) {
+            remove_ids(docs);
+            _.sortBy(docs, 'a').should.eql([{ a: 1 }, { a: 2 }]);
+            done();
+          });
+          d.insert([{ a: 1 }, { a: 2}], function (err, doc) {
+            if (err) throw err;
+          });
+        });
+      });
+
+      describe('when the insert fails', function () {
+        it('The inserted event is not emitted', function (done) {          
+          d.ensureIndex({ fieldName: 'a', unique: true }, function (err) {
+            if (err) throw err;
+          });
+          d.insert({ a: 1 }, function (err, doc) {
+            if (err) throw err;
+            d.on('inserted', function (docs) {
+              throw new Error('Inserted emitted');
+            });
+            d.insert({ a: 1 }, function (err, doc) {
+              setTimeout(done, 100);
+            });
+          });
+        });
+      });
+
+    });
   });   // ==== End of 'Insert' ==== //
 
 
@@ -1920,6 +1973,45 @@ describe('Database', function () {
       });
     });
 
+
+    describe('Events', function () {
+
+      describe('when a document is removed', function () {
+        it('emits the removed event with the doc', function (done) {
+          var id;
+          d.on('removed', function (docs) {
+            remove_ids(docs);
+            docs.should.eql([id]);
+            done();
+          });
+          d.insert({ a: 1, b: 'foo' }, function (err, doc) {
+            if (err) throw err;
+            id = doc._id;
+            d.remove({ a: 1 }, {}, function (err) {
+              if (err) throw err;
+            });
+          });
+        });
+      });
+
+      describe('when multiple documents are removed', function () {
+        it('emits the removed event with the docs', function (done) {
+          d.on('removed', function (docs) {
+            remove_ids(docs);                      
+            docs.length.should.equal(2);
+            done();
+          });
+          d.insert([{ a: 1, b: 'foo' }, { a: 2, b: 'foo' }], function (err) {
+            if (err) throw err;            
+            d.remove({ b: 'foo' }, { multi:true }, function (err) {
+              if (err) throw err;              
+            });
+          });
+        });
+      });
+
+
+    });
   });   // ==== End of 'Remove' ==== //
 
 
