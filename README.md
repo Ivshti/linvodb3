@@ -473,6 +473,23 @@ db.remove({ system: 'solar' }, { multi: true }, function (err, numRemoved) {
 });
 ```
 
+### Events 
+```javascript
+// Hook-like
+db.on('save', function(doc) { }) // Will be called before saving a document - no matter if using save, insert or update methods. You can modify the document in this event, it's essentially a hook
+db.on('insert', function(doc) { }) // Will be called before saving a new document - again, no matter if using save/insert/update methods. You can modify the document in this event
+db.on('remove', function(id) { }) // Before removing a document; called with the ID of the doc
+
+// After operation is complete
+db.on('inserted', function(docs) { }) // Called after inserting new documents is complete; docs is an array of documents
+db.on('updated', function(docs) { }) // Called after updating documents is complete; docs is an array of documents
+db.on('removed', function(ids) { }) // Called after removing documents is complete; ids is an array of ids
+
+```
+
+
+
+
 ### Indexing
 NeDB supports indexing. It gives a very nice speed boost and can be used to enforce a unique constraint on a field. You can index any field, including fields in nested documents using the dot notation. For now, indexes are only used to speed up basic queries and queries using `$in`, `$lt`, `$lte`, `$gt` and `$gte`.
 

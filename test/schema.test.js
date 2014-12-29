@@ -266,7 +266,7 @@ describe('Schema', function () {
     it("use pre-action events to set _ctime and _mtime", function(done) {
       
       d.on("insert", function(doc) { doc._ctime = new Date() });
-      d.on("update", function(doc) { doc._mtime = new Date() });
+      d.on("save", function(doc) { doc._mtime = new Date() });
 
       new d({ name: "Jan", age: 32 }).save(function(err, doc){
         assert.isNull(err);
