@@ -1530,6 +1530,13 @@ describe('Database', function () {
         });
       });
     });
+    
+    it('Cannot perform upsert with badly formatted fields', function(done) {
+      d.update({_id: '1234'}, { $set: { $$badfield: 5 }}, { upsert: true }, function(err, doc) {
+        assert.isDefined(err);
+        done();
+      })
+    });
 
     it('Can upsert a document even with modifiers', function (done) {
       d.update({ bloup: 'blap' }, { $set: { hello: 'world' } }, { upsert: true }, function (err, nr, newDoc) {
