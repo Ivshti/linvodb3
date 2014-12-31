@@ -111,7 +111,7 @@ describe('Schema', function () {
 
     it("type validation on constructing", function(done) {
       d = new Model("testDb", { 
-        name: { index: true, unique: true, sparse: true },
+        name: { index: true, unique: true, sparse: true, type: "string" },
         age: { index: true, type: "number" },
         department: { index: false },
         address: { city: { index: true } }
@@ -119,6 +119,11 @@ describe('Schema', function () {
 
       var doc = new d({ name: "Kelly", department: "support", address: { city: "Scranon" }, age: "28" });
       (doc.age === 28).should.equal(true);
+
+      // Typecasting
+      doc.name = 26;
+      (doc.name === "26").should.equal(true);
+
       done();
     });
 
