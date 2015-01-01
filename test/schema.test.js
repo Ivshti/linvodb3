@@ -9,6 +9,7 @@ var should = require('chai').should()
   , rimraf = require('rimraf')
   , Model = require('../lib/model')
   , Cursor = require('../lib/cursor')
+  , Schemas = require('../lib/schemas')
   ;
 
 
@@ -185,7 +186,24 @@ describe('Schema', function () {
       done();
     });
   }); // End of Validation
-    
+
+
+  describe('Normalize', function() {
+    it("type shorthands", function(done) { 
+      assert.deepEqual(Schemas.normalize({ 
+        name: "string",
+        age: { type: "number", default: 5 }
+      }), {
+        name: { type: "string" },
+        age: { type: "number", default: 5 }
+      });
+      done();
+    });
+
+    it("nested objects", function() {
+
+    });
+  });
 
 
   describe('Model instance', function() {
