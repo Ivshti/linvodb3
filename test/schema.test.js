@@ -173,14 +173,15 @@ describe('Schema', function () {
 
     it("default value", function(done) {
       d = new Model("testDb", { 
-        name: { index: true, unique: true, sparse: true },
-        age: { index: true, type: "number", default: 5 },
+        name: { index: true, unique: true, sparse: true, type: "string", default: "Billy" },
+        age: { index: true, type: "number" },
         department: { index: false },
         address: { city: { index: true } }
       }, { filename: testDb });
 
-      var doc = new d({ name: "Kelly", department: "support", address: { city: "Scranon" } });
-      doc.age.should.equal(5);
+      var doc = new d({ department: "support", address: { city: "Scranon" } });
+      doc.age.should.equal(0); // Default value, without having it specified
+      doc.name.should.equal("Billy"); // Default value, specified in the spec
       done();
     });
   }); // End of Validation
