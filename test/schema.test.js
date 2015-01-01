@@ -122,7 +122,7 @@ describe('Schema', function () {
         name: { index: true, unique: true, sparse: true, type: "string" },
         age: { index: true, type: "number" },
         department: { index: false },
-        address: { city: { index: true, type: "string" } }
+        address: { city: { index: true, type: "string" }, number: "number" }
       }, { filename: testDb });
 
       var doc = new d({ name: "Kelly", department: "support", address: { city: "Scranon", number: "24" }, age: "28" })
@@ -131,6 +131,8 @@ describe('Schema', function () {
 
       doc.address = { city: 10, number: "50" };
       assert.deepEqual(doc.address, { city: "10", number: 50 }); // check if we're typecasting
+
+      done();
     });
 
 
@@ -200,8 +202,17 @@ describe('Schema', function () {
       done();
     });
 
-    it("nested objects", function() {
-
+    it("nested objects", function(done) {
+      assert.deepEqual(Schemas.normalize({ 
+        name: "string",
+        age: { type: "number", default: 5 },
+        address: { city: "string" }
+      }), {
+        name: { type: "string" },
+        age: { type: "number", default: 5 },
+        address: { type: "object", schema: { city: {type: "string" } } }
+      });
+      done();
     });
   });
 
