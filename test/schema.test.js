@@ -110,6 +110,8 @@ describe('Schema', function () {
       doc.name = 26;
       (doc.name === "26").should.equal(true);
 
+      // TODO: test other types
+
       done();
     });
 
@@ -123,7 +125,10 @@ describe('Schema', function () {
 
       var doc = new d({ name: "Kelly", department: "support", address: { city: "Scranon", number: "24" }, age: "28" })
       doc.address.city = 5;
-      (doc.address.city === "5").should.equal(true)
+      (doc.address.city === "5").should.equal(true);
+
+      doc.address = { city: 10, number: "50" };
+      assert.deepEqual(doc.address, { city: "10", number: 50 }); // check if we're typecasting
     });
 
 
