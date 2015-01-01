@@ -101,14 +101,15 @@ describe('Schema', function () {
 
       var doc = new d({ name: "Kelly", age: 27, department: "support", address: { city: "Scranon" } });
       assert.equal(doc.age, 27);
+
       doc.age = 28;
-      (doc.age===28).should.equal(true);
+      doc.age.should.equal(28);
       doc.age = "bullshit";
-      (doc.age===28).should.equal(true);
+      doc.age.should.equal(28);
 
       // Typecasting
       doc.name = 26;
-      (doc.name === "26").should.equal(true);
+      doc.name.should.equal("26");
 
       // TODO: test other types
 
@@ -125,7 +126,7 @@ describe('Schema', function () {
 
       var doc = new d({ name: "Kelly", department: "support", address: { city: "Scranon", number: "24" }, age: "28" })
       doc.address.city = 5;
-      (doc.address.city === "5").should.equal(true);
+      doc.address.city.should.equal("5");
 
       doc.address = { city: 10, number: "50" };
       assert.deepEqual(doc.address, { city: "10", number: 50 }); // check if we're typecasting
@@ -164,8 +165,8 @@ describe('Schema', function () {
       }, { filename: testDb });
 
       var doc = new d({ name: "Kelly", department: "support", address: { city: "Scranon", number: "24" }, age: "28" });
-      (doc.age === 28).should.equal(true);
-      (doc.address.number === 24).should.equal(true);
+      doc.age.should.equal(28);
+      doc.address.number.should.equal(24);
 
       done();
     });
@@ -173,13 +174,13 @@ describe('Schema', function () {
     it("default value", function(done) {
       d = new Model("testDb", { 
         name: { index: true, unique: true, sparse: true },
-        age: { index: true, type: "number" },
+        age: { index: true, type: "number", default: 5 },
         department: { index: false },
         address: { city: { index: true } }
       }, { filename: testDb });
 
       var doc = new d({ name: "Kelly", department: "support", address: { city: "Scranon" } });
-      (doc.age===0).should.equal(true);
+      doc.age.should.equal(5);
       done();
     });
   }); // End of Validation
