@@ -113,18 +113,30 @@ describe('Schema', function () {
       done();
     });
 
-
     it("type validation on underlying objects", function(done) {
       d = new Model("testDb", { 
         name: { index: true, unique: true, sparse: true, type: "string" },
         age: { index: true, type: "number" },
         department: { index: false },
-        address: { city: { index: true } }
+        address: { city: { index: true, type: "string" } }
+      }, { filename: testDb });
+
+      var doc = new d({ name: "Kelly", department: "support", address: { city: "Scranon", number: "24" }, age: "28" })
+      doc.address.city = 5;
+      (doc.address.city === "5").should.equal(true)
+    });
+
+
+    it("type validation on underlying objects, via dot notation", function(done) {
+      d = new Model("testDb", { 
+        name: { index: true, unique: true, sparse: true, type: "string" },
+        age: { index: true, type: "number" },
+        department: { index: false },
+        address: { city: { index: true, type: "string" } }
       }, { filename: testDb });
 
       done(new Error("Not implemented"));
     });
-
 
     it("type validation on underlying arrays", function(done) {
       d = new Model("testDb", { 
@@ -137,16 +149,18 @@ describe('Schema', function () {
       done(new Error("Not implemented"));
     });
 
+
     it("type validation on constructing", function(done) {
       d = new Model("testDb", { 
         name: { index: true, unique: true, sparse: true, type: "string" },
         age: { index: true, type: "number" },
         department: { index: false },
-        address: { city: { index: true } }
+        address: { city: { index: true, type: "string" }, number: { type: "number" } }
       }, { filename: testDb });
 
-      var doc = new d({ name: "Kelly", department: "support", address: { city: "Scranon" }, age: "28" });
+      var doc = new d({ name: "Kelly", department: "support", address: { city: "Scranon", number: "24" }, age: "28" });
       (doc.age === 28).should.equal(true);
+      (doc.address.number === 24).should.equal(true);
 
       done();
     });
