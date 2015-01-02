@@ -194,10 +194,12 @@ describe('Schema', function () {
     it("type shorthands", function(done) { 
       assert.deepEqual(Schemas.normalize({ 
         name: "string",
-        age: { type: "number", default: 5 }
+        age: { type: "number", default: 5 },
+        tags: ["string"]
       }), {
         name: { type: "string" },
-        age: { type: "number", default: 5 }
+        age: { type: "number", default: 5 },
+        tags: { type: "array", schema: { type: "string" } }
       });
       done();
     });
@@ -206,11 +208,13 @@ describe('Schema', function () {
       assert.deepEqual(Schemas.normalize({ 
         name: "string",
         age: { type: "number", default: 5 },
-        address: { city: "string" }
+        address: { city: "string" },
+        tags: [{name: "string"}]
       }), {
         name: { type: "string" },
         age: { type: "number", default: 5 },
-        address: { type: "object", schema: { city: {type: "string" } } }
+        address: { type: "object", schema: { city: {type: "string" } } },
+        tags: { type: "array", schema: { name: { type: "string" } } }
       });
       done();
     });
