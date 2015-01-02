@@ -391,6 +391,32 @@ describe('Schema', function () {
         done();
       });
     });
+
+
+    it("define instance method", function(done) {
+      d.method("findSameDepartment", function(cb) {
+        return d.find({ department: this.department }, cb);
+      });
+
+      d.findOne({name: "Jim"},function(err, jim) {
+        jim.findSameDepartment(function(err, res) {
+          assert.isNull(err);
+          res.length.should.equal(3);
+          done();
+        });
+      });
+    });    
+
+    it("define static method", function(done) {
+      d.static("findSales", function(cb) {
+        return this.find({ department: "sales" }, cb);
+      });
+      d.findSales(function(err, sales) {
+        assert.isNull(err);
+        sales.length.should.equal(3);
+        done();
+      })
+    });
   }); // End of Model Instance
 
   
