@@ -117,6 +117,26 @@ describe('Schema', function () {
       done();
     });
 
+    it("getter/setter", function(done) {
+      d = new Model("testDb", { 
+        name: { index: true, unique: true, sparse: true, type: "string" },
+        age: { index: true, type: "number" },
+        department: { index: false },
+        address: { city: { index: true } },
+        doubleAge: { get: function() { return 2 * this.age } },
+        tripleAge: { get: function() { return 3 * this.age }, set: function(v) { this.age = v/3 } }
+      }, { filename: testDb });
+
+      var doc = new d({ name: "Kelly", age: 27, department: "support", address: { city: "Scranon" } });
+
+      doc.doubleAge.should.equal(54);
+      doc.tripleAge = 75;
+      doc.age.should.equal(25);
+
+      done();
+    });
+
+
     it("type validation on underlying objects", function(done) {
       d = new Model("testDb", { 
         name: { index: true, unique: true, sparse: true, type: "string" },
