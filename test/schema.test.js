@@ -152,10 +152,42 @@ describe('Schema', function () {
         name: { index: true, unique: true, sparse: true, type: "string" },
         age: { index: true, type: "number" },
         department: { index: false },
-        address: { city: { index: true } }
+        address: { city: { index: true } },
+        tags: ["string"],
+        hits: ["number"],
+        addons: []
       }, { filename: testDb });
 
-      done(new Error("Not implemented"));
+      var doc = new d({ name: "Kelly", department: "support", address: { city: "Scranon", number: "24" }, age: "28",
+        tags: ["one", "two", "three"],
+        hits: ["one", 1, 2]
+        // don't iniailize hits
+      });
+
+      // Defaults, also on-construct screening
+      assert.deepEqual(doc.tags, ["one", "two", "three"]);
+      assert.deepEqual(doc.hits, [1,2]);
+      assert.deepEqual(doc.addons, []);
+
+      // All values are castable, always cast
+      doc.tags = ["two", 55, 99]
+      assert.deepEqual(doc.tags, ["two", "55", "99"]);
+      doc.tags.push("five");
+      doc.tags.push(5);
+      assert.deepEqual(doc.tags, ["two", "55", "99", "five", "5"]);
+
+      // We're inserting the value if castable, but not if it isn't
+      doc.hits.push("595");
+      doc.hits.push("bananas");
+      assert.deepEqual(doc.hits, [1,2,595]);
+
+      // Schema-less
+      doc.addons = [1];
+      doc.addons.push("5");
+      doc.addons.push(10);
+      assert.deepEqual(doc.addons, [1, "5", 10]);
+
+      done();
     });
 
 
@@ -199,7 +231,7 @@ describe('Schema', function () {
       }), {
         name: { type: "string" },
         age: { type: "number", default: 5 },
-        tags: { type: "array", schema: { type: "string" } }
+        tags: { type: "array", schema: "string" }
       });
       done();
     });
@@ -209,12 +241,10 @@ describe('Schema', function () {
         name: "string",
         age: { type: "number", default: 5 },
         address: { city: "string" },
-        tags: [{name: "string"}]
       }), {
         name: { type: "string" },
         age: { type: "number", default: 5 },
-        address: { type: "object", schema: { city: {type: "string" } } },
-        tags: { type: "array", schema: { name: { type: "string" } } }
+        address: { type: "object", schema: { city: { type: "string" } } },
       });
       done();
     });
