@@ -26,6 +26,7 @@
     "async": "0.2.10",
     "lodash": "2.4.x",
     "bagpipe": "0.3.x",
+    "async-debounce": "0.0.x",
     "binary-search-tree": "0.2.4",
     "levelup": "0.19.x"
   },
