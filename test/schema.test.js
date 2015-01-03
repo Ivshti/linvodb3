@@ -156,17 +156,6 @@ describe('Schema', function () {
     });
 
 
-    it("type validation on underlying objects, via dot notation", function(done) {
-      d = new Model("testDb", { 
-        name: { index: true, unique: true, sparse: true, type: "string" },
-        age: { index: true, type: "number" },
-        department: { index: false },
-        address: { city: { index: true, type: "string" } }
-      }, { filename: testDb });
-
-      done(new Error("Not implemented"));
-    });
-
     it("type validation on underlying arrays", function(done) {
       d = new Model("testDb", { 
         name: { index: true, unique: true, sparse: true, type: "string" },
