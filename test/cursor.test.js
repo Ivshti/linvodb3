@@ -947,14 +947,14 @@ describe('Cursor', function () {
           { age: 23, name: "Ryan", department: "sales" },
         ], [ // Add Stanley
           { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } }, 
-          { name: "Stanley", age: 58, department: "sales" },
           { age: 45, name: "Phyllis", department: "sales" },
           { age: 23, name: "Ryan", department: "sales" },
+          { name: "Stanley", age: 58, department: "sales" },
         ], [ // Update Phyllis
           { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } }, 
-          { name: "Stanley", age: 58, department: "sales" },
           { age: 46, name: "Phyllis", department: "sales" },
           { age: 23, name: "Ryan", department: "sales" },
+          { name: "Stanley", age: 58, department: "sales" },
         ]
       ];
       
@@ -963,7 +963,7 @@ describe('Cursor', function () {
       }, function() {
         d.save({ name: "Stanley", age: 58, department: "sales" }, _.noop);
       }, function() { 
-        d.update({ name: "Phyllis" }, { age: { $inc: 1 } }, {}, _.noop);
+        d.update({ name: "Phyllis" }, { $inc: { age: 1 } }, {}, _.noop);
       }, function() { }];
 
       d.insert([
@@ -979,11 +979,12 @@ describe('Cursor', function () {
         var query = d.find({ department: "sales" }).sort({ name: 1 }).live();
         d.on("liveQueryUpdate", function() {
           var exp = expected.shift(), mod = modifiers.shift();
-          if (! exp) done(); // All done
           
           //console.log(query.res.map(function(x){return x.name}), exp.map(function(x){return x.name}));
           assert.deepEqual(query.res.map(function(x) { return _.omit(x, "_id") }), exp);
           mod();
+
+          if (! expected.length) done();
         })
 
         /*
