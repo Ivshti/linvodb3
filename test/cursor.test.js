@@ -928,6 +928,72 @@ describe('Cursor', function () {
     });       
   });  // ===== End of 'getMatches' =====
 
+  
+  describe("Live query", function() {
+    it("Live query test", function(done) {
+      /* 
+       * We do things on the dataset, expecting certain results after updating the live query
+       * We test removing, inserting, updating and if modifying an object we don't care about triggers live query update
+       */
+      var expected = [
+        [ // Default results
+          { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } },         
+          { age: 31, name: "Jim", department: "sales", address: { city: "Scranton" } },
+          { age: 45, name: "Phyllis", department: "sales" },
+          { age: 23, name: "Ryan", department: "sales" },
+        ], [ // Remove Jim
+          { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } }, 
+          { age: 45, name: "Phyllis", department: "sales" },
+          { age: 23, name: "Ryan", department: "sales" },
+        ], [ // Add Stanley
+          { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } }, 
+          { name: "Stanley", age: 58, department: "sales" },
+          { age: 45, name: "Phyllis", department: "sales" },
+          { age: 23, name: "Ryan", department: "sales" },
+        ], [ // Update Phyllis
+          { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } }, 
+          { name: "Stanley", age: 58, department: "sales" },
+          { age: 46, name: "Phyllis", department: "sales" },
+          { age: 23, name: "Ryan", department: "sales" },
+        ]
+      ];
+      
+      var modifiers = [function() {
+        d.remove({ name: "Jim" }, {}, _.noop);
+      }, function() {
+        d.save({ name: "Stanley", age: 58, department: "sales" }, _.noop);
+      }, function() { 
+        d.update({ name: "Phyllis" }, { age: { $inc: 1 } }, {}, _.noop);
+      }, function() { }];
+
+      d.insert([
+        { age: 27, name: "Kelly", department: "support", address: { city: "Scranton" } },
+        { age: 31, name: "Jim", department: "sales", address: { city: "Scranton" } },
+        { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } }, 
+        { age: 45, name: "Michael", department: "management" },
+        { age: 46, name: "Toby", department: "hr" },
+        { age: 45, name: "Phyllis", department: "sales" },
+        { age: 23, name: "Ryan", department: "sales" },
+
+      ], function (err) {
+        var query = d.find({ department: "sales" }).sort({ name: 1 }).live();
+        d.on("liveQueryUpdate", function() {
+          var exp = expected.shift(), mod = modifiers.shift();
+          if (! exp) done(); // All done
+          
+          //console.log(query.res.map(function(x){return x.name}), exp.map(function(x){return x.name}));
+          assert.deepEqual(query.res.map(function(x) { return _.omit(x, "_id") }), exp);
+          mod();
+        })
+
+        /*
+        async.waterfall([function(cb) {
+
+        }],done);
+        */
+      });
+    });
+  })
 
 });
 
