@@ -930,7 +930,20 @@ describe('Cursor', function () {
 
   
   describe("Live query", function() {
-    it("Live query test", function(done) {
+    beforeEach(function(done) {
+      d.insert([
+        { age: 27, name: "Kelly", department: "support", address: { city: "Scranton" } },
+        { age: 31, name: "Jim", department: "sales", address: { city: "Scranton" } },
+        { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } }, 
+        { age: 45, name: "Michael", department: "management" },
+        { age: 46, name: "Toby", department: "hr" },
+        { age: 45, name: "Phyllis", department: "sales" },
+        { age: 23, name: "Ryan", department: "sales" },
+
+      ], function(err) { done() });
+    });
+
+    it("Updates properly", function(done) {
       /* 
        * We do things on the dataset, expecting certain results after updating the live query
        * We test removing, inserting, updating and if modifying an object we don't care about triggers live query update
@@ -966,36 +979,47 @@ describe('Cursor', function () {
         d.update({ name: "Phyllis" }, { $inc: { age: 1 } }, {}, _.noop);
       }, function() { }];
 
-      d.insert([
-        { age: 27, name: "Kelly", department: "support", address: { city: "Scranton" } },
-        { age: 31, name: "Jim", department: "sales", address: { city: "Scranton" } },
-        { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } }, 
-        { age: 45, name: "Michael", department: "management" },
-        { age: 46, name: "Toby", department: "hr" },
-        { age: 45, name: "Phyllis", department: "sales" },
-        { age: 23, name: "Ryan", department: "sales" },
 
-      ], function (err) {
-        var query = d.find({ department: "sales" }).sort({ name: 1 }).live();
-        d.on("liveQueryUpdate", function() {
-          var exp = expected.shift(), mod = modifiers.shift();
-          
-          //console.log(query.res.map(function(x){return x.name}), exp.map(function(x){return x.name}));
-          assert.deepEqual(query.res.map(function(x) { return _.omit(x, "_id") }), exp);
-          mod();
+      var query = d.find({ department: "sales" }).sort({ name: 1 }).live();
+      d.on("liveQueryUpdate", function() {
+        var exp = expected.shift(), mod = modifiers.shift();
+        
+        //console.log(query.res.map(function(x){return x.name}), exp.map(function(x){return x.name}));
+        assert.deepEqual(query.res.map(function(x) { return _.omit(x, "_id") }), exp);
+        mod();
 
-          if (! expected.length) done();
-        })
-
-        /*
-        async.waterfall([function(cb) {
-
-        }],done);
-        */
+        if (! expected.length) done();
       });
     });
-  })
 
-});
+    it("Doesn't update for no reason", function(done) {
+      done = _.once(done);
+
+      var query = d.find({ department: "sales" }).sort({ name: 1 }).live();
+      
+      var called = false;
+      d.on("liveQueryUpdate", function() {
+        if (called) return done(new Error("liveQueryUpdate called more than once"));
+        called = true;
+
+        query.res.length.should.equal(4);
+      });
+
+      d.once("liveQueryUpdate", function() {
+        async.waterfall([function(cb) { 
+          d.remove({name: "Kelly"},{},function(){cb()})
+        }, function(cb) {
+          d.update({ name: "Michael" }, { $inc: { age: 1 } }, { },function(){cb()});
+        }, function(cb) { 
+          d.insert({ name: "Plop", department: "service", age: 19 },function(){cb()});
+        }], function() { 
+          setTimeout(function() { done() }, 300);
+        });
+      });
+    });
+
+  }); // End of 'Live Query'
+
+}); 
 
 
