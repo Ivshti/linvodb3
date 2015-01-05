@@ -31,71 +31,15 @@ It's a subset of MongoDB's API (the most used operations). The current API will 
 * <a href="#browser-version">Browser version</a>
 
 ### Creating/loading a database
-You can use NeDB as an in-memory only datastore or as a persistent datastore. One datastore is the equivalent of a MongoDB collection. The constructor is used as follows `new Datastore(options)` where `options` is an object with the following fields:  
-
-* `filename` (optional): path to the file where the data is persisted. If left blank, the datastore is automatically considered in-memory only. It cannot end with a `~` which is used in the temporary files NeDB uses to perform crash-safe writes
-* `inMemoryOnly` (optional, defaults to false): as the name implies.
-* `autoload` (optional, defaults to false): if used, the database will
-  automatically be loaded from the datafile upon creation (you don't
-need to call `loadDatabase`). Any command
-issued before load is finished is buffered and will be executed when
-load is done.
-* `onload` (optional): if you use autoloading, this is the handler called after the `loadDatabase`. It takes one `error` argument. If you use autoloading without specifying this handler, and an error happens during load, an error will be thrown.
-* `nodeWebkitAppName` (optional, **DEPRECATED**): if you are using NeDB from whithin a Node Webkit app, specify its name (the same one you use in the `package.json`) in this field and the `filename` will be relative to the directory Node Webkit uses to store the rest of the application's data (local storage etc.). It works on Linux, OS X and Windows. Now that you can use `require('nw.gui').App.dataPath` in Node Webkit to get the path to the data directory for your application, you should not use this option anymore and it will be removed.
-
-If you use a persistent datastore without the `autoload` option, you need to call `loadDatabase` manually.
-This function fetches the data from datafile and prepares the database. **Don't forget it!** If you use a
-persistent datastore, no command (insert, find, update, remove) will be executed before `loadDatabase`
-is called, so make sure to call it yourself or use the `autoload`
-option.
 
 ```javascript
-// Type 1: In-memory only datastore (no need to load the database)
-var Datastore = require('nedb')
-  , db = new Datastore();
-
-
-// Type 2: Persistent datastore with manual loading
-var Datastore = require('nedb')
-  , db = new Datastore({ filename: 'path/to/datafile' });
-db.loadDatabase(function (err) {    // Callback is optional
-  // Now commands will be executed
-});
-
-
-// Type 3: Persistent datastore with automatic loading
-var Datastore = require('nedb')
-  , db = new Datastore({ filename: 'path/to/datafile', autoload: true });
-// You can issue commands right away
-
-
-// Type 4: Persistent datastore for a Node Webkit app called 'nwtest'
-// For example on Linux, the datafile will be ~/.config/nwtest/nedb-data/something.db
-var Datastore = require('nedb')
-  , path = require('path')
-  , db = new Datastore({ filename: path.join(require('nw.gui').App.dataPath, 'something.db') });
-
-
-// Of course you can create multiple datastores if you need several
-// collections. In this case it's usually a good idea to use autoload for all collections.
-db = {};
-db.users = new Datastore('path/to/users.db');
-db.robots = new Datastore('path/to/robots.db');
-
-// You need to load each database (here we do it asynchronously)
-db.users.loadDatabase();
-db.robots.loadDatabase();
+var LinvoDB = require("linvodb");
+var name = "person";
+var schema = { }; // Non-strict, it can be left empty
+var schema = { name: "string" }; // But we at least define some properties
+var options = { filename: "./test.db" }; // we can also pass store, which is a levelup instance
+var Person = new LinvoDB(name, schema, options); // New model
 ```
-
-### Compacting the database
-Under the hood, NeDB's persistence uses an append-only format, meaning that all updates and deletes actually result in lines added at the end of the datafile. The reason for this is that disk space is very cheap and appends are much faster than rewrites since they don't do a seek. The database is automatically compacted (i.e. put back in the one-line-per-document format) everytime your application restarts.
-
-You can manually call the compaction function with `yourDatabase.persistence.compactDatafile` which takes no argument. It queues a compaction of the datafile in the executor, to be executed sequentially after all pending operations.
-
-You can also set automatic compaction at regular intervals with `yourDatabase.persistence.setAutocompactionInterval(interval)`, `interval` in milliseconds (a minimum of 5s is enforced), and stop automatic compaction with `yourDatabase.persistence.stopAutocompaction()`.
-
-Keep in mind that compaction takes a bit of time (not too much: 130ms for 50k records on my slow machine) and no other operation can happen when it does, so most projects actually don't need to use it.
-
 
 ### Inserting documents
 The native types are `String`, `Number`, `Boolean`, `Date` and `null`. You can also use
@@ -488,10 +432,14 @@ db.on('removed', function(ids) { }) // Called after removing documents is comple
 ```
 
 
+### Schemas
+
+### Live queries
+
 
 
 ### Indexing
-NeDB supports indexing. It gives a very nice speed boost and can be used to enforce a unique constraint on a field. You can index any field, including fields in nested documents using the dot notation. For now, indexes are only used to speed up basic queries and queries using `$in`, `$lt`, `$lte`, `$gt` and `$gte`.
+LinvoDB supports and utilizes indexing heavily. It gives a very nice speed boost and can be used to enforce a unique constraint on a field. You can index any field, including fields in nested documents using the dot notation. For now, indexes are only used to speed up basic queries and queries using `$in`, `$lt`, `$lte`, `$gt` and `$gte`.
 
 To create an index, use `datastore.ensureIndex(options, cb)`, where callback is optional and get passed an error if any (usually a unique constraint that was violated). `ensureIndex` can be called when you want, even after some data was inserted, though it's best to call it at application startup. The options are:  
 
