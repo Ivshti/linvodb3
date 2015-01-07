@@ -1406,6 +1406,34 @@ describe('Database', function () {
       ], done);
     });
 
+
+    it("Can update via modifier function", function(done) {
+        d.insert([{ somedata: 'ok' }, { somedata: "again" }, { somedata: "againy" }], function (err) {
+          d.update({somedata: "ok"}, function(doc) { doc.somedata+='o' }, {}, function(err) {
+            assert.isNull(err);
+            d.findOne({ somedata: "oko" }, function(err, doc) {
+              assert.isNull(err);
+              assert.isDefined(doc);
+              doc.somedata.should.equal("oko");
+              done();
+            })
+
+          });
+        });
+    });
+
+
+
+    it("Can't change _id via modifier function", function(done) {
+        d.insert([{ somedata: 'ok' }, { somedata: "again" }, { somedata: "againy" }], function (err) {
+          d.update({somedata: "ok"}, function(doc) { doc._id+='o' }, {}, function(err) {
+            assert.isDefined(err);
+            done();
+          });
+        });
+    });
+
+
     describe('Upserts', function () {
     
       it('Can perform upserts if needed', function (done) {
