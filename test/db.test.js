@@ -1468,7 +1468,24 @@ describe('Database', function () {
           });
         });
       });
-      
+
+      it('Can upsert with a modifier function', function (done) {
+        d.update({ $or: [{ a: 4 }, { a: 5 }] }, function(doc) { 
+          doc.hello = "world";
+          doc.bloup = "blapp";
+        }, { upsert: true }, function (err) {
+          d.find({}, function (err, docs) {
+            assert.isNull(err);
+            docs.length.should.equal(1);
+            var doc = docs[0];
+            Object.keys(doc).length.should.equal(3);
+            doc.hello.should.equal('world');
+            doc.bloup.should.equal('blapp');
+            done();
+          });
+        });
+      });
+            
       it('If the update query is a normal object with no modifiers, it is the doc that will be upserted', function (done) {
         d.update({ $or: [{ a: 4 }, { a: 5 }] }, { hello: 'world', bloup: 'blap' }, { upsert: true }, function (err) {
           d.find({}, function (err, docs) {
@@ -1482,7 +1499,7 @@ describe('Database', function () {
           });
         });
       });
-      
+
       it('If the update query contains modifiers, it is applied to the object resulting from removing all operators from the find query 1', function (done) {
         d.update({ $or: [{ a: 4 }, { a: 5 }] }, { $set: { hello: 'world' }, $inc: { bloup: 3 } }, { upsert: true }, function (err) {
           d.find({ hello: 'world' }, function (err, docs) {
