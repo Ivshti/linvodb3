@@ -97,7 +97,8 @@ describe('Schema', function () {
         name: { index: true, unique: true, sparse: true, type: "string" },
         age: { index: true, type: "number" },
         department: { index: false },
-        address: { city: { index: true } }
+        address: { city: { index: true } },
+        other: true
       }, { filename: testDb });
 
       var doc = new d({ name: "Kelly", age: 27, department: "support", address: { city: "Scranon" } });
@@ -111,6 +112,12 @@ describe('Schema', function () {
       // Typecasting
       doc.name = 26;
       doc.name.should.equal("26");
+
+      // Any type allowed
+      doc.other = "test";
+      doc.other.should.equal("test");
+      doc.other = 5;
+      doc.other.should.equal(5);
 
       // TODO: test other types
 
