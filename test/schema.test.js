@@ -98,7 +98,9 @@ describe('Schema', function () {
         age: { index: true, type: "number" },
         department: { index: false },
         address: { city: { index: true } },
-        other: true
+        other: true,
+        active: Boolean, // test the new syntax
+        started: Date
       }, { filename: testDb });
 
       var doc = new d({ name: "Kelly", age: 27, department: "support", address: { city: "Scranon" } });
@@ -119,7 +121,23 @@ describe('Schema', function () {
       doc.other = 5;
       doc.other.should.equal(5);
 
-      // TODO: test other types
+      // Booleans, also tests the constructor-based syntax (Boolean vs "boolean")
+      doc.active.should.equal(false);
+      doc.active = 0;
+      doc.active.should.equal(false);
+      doc.active = 5;
+      doc.active.should.equal(true);
+
+      // Dates
+      doc.started = new Date("2014-10-28");
+      doc.started.getTime().should.equal(new Date("2014-10-28").getTime());
+
+      doc.started = "2014-10-29";
+      doc.started.getTime().should.equal(new Date("2014-10-29").getTime());
+
+      doc.started = new Date("2014-11-29").getTime();
+      doc.started.getTime().should.equal(new Date("2014-11-29").getTime());
+
 
       done();
     });
