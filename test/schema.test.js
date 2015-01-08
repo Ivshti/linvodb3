@@ -162,6 +162,23 @@ describe('Schema', function () {
     });
 
 
+    it("type validation via regexp", function(done) {
+      d = new Model("testDb", { 
+        name: { index: true, unique: true, sparse: true, type: /^j(.*)y$/i },
+      }, { filename: testDb });
+
+      var doc = new d({ name: "Jay" });
+      assert.equal(doc.name, "Jay");
+
+      doc.name = "Jason";
+      assert.equal(doc.name, "Jay");
+
+      doc.name = "Jaimy";
+      assert.equal(doc.name, "Jaimy");
+
+      done();
+    });
+
     it("type validation on underlying objects", function(done) {
       d = new Model("testDb", { 
         name: { index: true, unique: true, sparse: true, type: "string" },
