@@ -9,7 +9,7 @@
     "Louis Chatriot",
     "Ivo Georgiev"
   ],
-  "description": "Model-oriented embedded database with a Mongoose-like API over LevelUP",
+  "description": "Model-oriented embedded database, inspired by Mongoose & MongoDB, over LevelUP",
   "keywords": [
     "database",
     "datastore",
