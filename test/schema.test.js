@@ -177,7 +177,13 @@ describe('Schema', function () {
       ], function() {
         d.findOne({ _id: "Kelly" }, function(err, doc) {
           doc.name.should.equal("Kelly");
-          done();
+
+          d.insert({name: "Kelly"},function(err, doc) {
+            assert.isUndefined(doc);
+            assert.isDefined(err);
+            err.errorType.should.equal("uniqueViolated");
+            done();
+          });
         });
       });
 
