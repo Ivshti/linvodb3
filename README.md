@@ -49,6 +49,7 @@ var schema = { name: "string" }; // But we at least define some properties
 var options = { filename: "./test.db" }; // we can also pass store, which is a levelup instance
 var Person = new LinvoDB(name, schema, options); // New model
 
+LinvoDB.dbPath // default path where data files are stored for each model
 LinvoDB.defaults // default options for every model
 ```
 
