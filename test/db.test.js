@@ -564,8 +564,8 @@ describe('Database', function () {
     it('Can use an index to get docs with $regex', function (done) {
       var doc1, doc2;
       d.insert([
-          doc1 = new d({ name: "Jim" }),
-          doc2 = new d({ name: "Jan" }),
+          doc1 = { name: "Jim" },
+          doc2 = { name: "Jan" },
           { name: "Dwight" },
           { name: "Oscar "},
           { somethingElse: "else" }
@@ -575,8 +575,9 @@ describe('Database', function () {
             data.length.should.equal(2);
             data.sort(function(b,a){ return a.name > b.name });
 
-            assert.deepEqual(doc1, data[0]);
-            assert.deepEqual(doc2, data[1]);
+            doc1.name.should.equal(data[0].name);
+            doc2.name.should.equal(data[1].name);
+
             done();
         });
       });
