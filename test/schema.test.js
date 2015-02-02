@@ -161,6 +161,27 @@ describe('Schema', function () {
       done();
     });
 
+    it("_id as a getter", function(done) {
+      d = new Model("testDb", { 
+        name: { index: true, unique: true, sparse: true, type: "string" },
+        age: { index: true, type: "number" },
+        department: { index: false },
+        address: { city: { index: true } },
+        _id: { get: function() { return this.name } },
+      }, { filename: testDb });
+
+      d.insert([
+        { name: "Kelly", age: 27, department: "support", address: { city: "Scranon" } },
+        { name: "Jim", age: 29, department: "sales", address: { city: "Scranon" } },
+
+      ], function() {
+        d.findOne({ _id: "Kelly" }, function(err, doc) {
+          doc.name.should.equal("Kelly");
+          done();
+        });
+      });
+
+    });
 
     it("type validation via regexp", function(done) {
       d = new Model("testDb", { 
