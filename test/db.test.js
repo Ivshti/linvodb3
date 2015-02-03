@@ -369,6 +369,40 @@ describe('Database', function () {
       });
     });
 
+    it('Use .save for bulk inserting documents, updating some', function (done) {
+      d.find({}, function (err, docs) {
+        docs.length.should.equal(0);
+
+        d.save([{ a: 5 }, { a: 10 }, { a: 12 }], function(err, docs) {
+          assert.isNull(err);
+          docs.length.should.equal(3);
+
+          d.findOne({ _id: docs[0]._id }, function(err, doc1) {
+            assert.isNull(err);
+            doc1.a.should.equal(5);
+            
+            doc1.b = 15;
+            d.save([doc1,{ a: 15 }], function(err, docs) {
+              assert.isNull(err);
+              docs.length.should.equal(2);
+
+              d.findOne({ _id: docs[0]._id }, function(err,doc2) {
+                doc2.a.should.equal(5);
+                doc2.b.should.equal(15);
+
+                d.find({}, function(err,docs) {
+                  assert.isNull(err);
+                  docs.length.should.equal(4);
+                  done();
+                });
+              });
+            });
+
+          });
+        });
+
+      });
+    });
     
     describe('Events', function () {
 
