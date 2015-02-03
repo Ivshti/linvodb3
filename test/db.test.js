@@ -1162,6 +1162,19 @@ describe('Database', function () {
         });
       });
     });
+
+
+    describe('Events', function() {
+      it('before query, allows to modify query', function (done) {
+        d.insert([{ tf: 4, r: 6 }, { tf: 5, r: 8 }], function (err) {
+          d.on('query', function(q) { q.tf=4 });
+          d.find({ r: { $gt: 5 } }, function(err, docs) {
+            docs.length.should.equal(1);
+            done();
+          })
+        });
+      });
+    });
     
   });   // ==== End of 'Find' ==== //
 
