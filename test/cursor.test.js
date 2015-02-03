@@ -814,6 +814,23 @@ describe('Cursor', function () {
         done();
       });
     });
+
+
+
+    it('aggregate', function (done) {
+      var cursor = new Cursor(d, {});
+
+      cursor.aggregate(function(res) {
+        return res.length
+      });
+
+      cursor.exec(function (err, res) {
+        assert.isNull(err);
+        res.should.equal(5);
+
+        done();
+      });
+    });    
   });   // ==== End of 'Map / Reduce' ====
 
 
