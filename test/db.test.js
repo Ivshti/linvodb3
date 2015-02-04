@@ -405,6 +405,17 @@ describe('Database', function () {
     });
     
     describe('Events', function () {
+      describe('construct', function () {
+        it('Emits the construct event when a doc is constructed', function (done) {
+          d.on('construct', function (doc) {
+            doc.a.should.equal(1);         
+            done();
+          });
+          d.insert({ a: 1 }, function (err, doc) {
+            if (err) throw err;
+          });
+        });
+      });
 
       describe('when a document is inserted', function () {
         it('Emits the inserted event with the inserted doc', function (done) {

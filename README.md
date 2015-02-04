@@ -300,6 +300,7 @@ db.find({}).count(function (err, count) {
 - remove
 - removed
 - saved
+- construct
 
 ### Updating documents
 `db.update(query, update, options, callback)` will update all documents matching `query` according to the `update` rules:  
