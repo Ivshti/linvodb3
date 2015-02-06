@@ -1035,6 +1035,24 @@ describe('Cursor', function () {
       });
     });
 
+    it("Query conditions can be changed dynamically", function(done) {
+      done = _.once(done);
+
+      var query = d.find({ department: "sales" }).sort({ name: 1 }).live();
+      
+      d.once("liveQueryUpdate", function() {
+        query.res.length.should.equal(4);
+        
+        query.find({ department: "management" }).refresh();
+        d.once("liveQueryUpdate", function() {
+          query.res.length.should.equal(1);
+          done();
+        });
+
+      });
+
+    });
+
   }); // End of 'Live Query'
 
 }); 
