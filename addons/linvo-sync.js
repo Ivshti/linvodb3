@@ -71,7 +71,7 @@ module.exports = function setupSync(model, api, options)
 
                     push = res;
                     callback();
-                },true)
+                }, true);
 
                 // It's correct to mark the DB before commiting the changes, but when compiling the list of changes
                 // Until the changes are commited, more changes might occur
