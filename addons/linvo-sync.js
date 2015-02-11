@@ -4,6 +4,8 @@ var async = require("async"),
 
 module.exports = function setupSync(model, api, options)
 {
+    if (model.linvoSync) return;
+    model.linvoSync = true;
 
     var options = options || {};
 
