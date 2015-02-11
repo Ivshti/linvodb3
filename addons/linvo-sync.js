@@ -42,7 +42,7 @@ module.exports = function setupSync(model, api, options)
             ensure_indexes: function(callback) { // Meaningless lookup to Ensure the DB has been indexed
                 model.count({ }, function(err, c) { 
                     callback();
-                });
+                }, true);
             },
             retrieve_remote: function(callback)
             {
