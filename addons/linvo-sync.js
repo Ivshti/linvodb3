@@ -114,7 +114,7 @@ module.exports = function setupSync(model, api, options)
             }],
             finalize: ["push_remote", "pull_local", function(callback)
             {
-                status("sync finished");
+                status("sync finished for "+model.modelName);
 
                 callback();
             }]
