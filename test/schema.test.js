@@ -200,8 +200,25 @@ describe('Schema', function () {
       doc.name = "Jason";
       assert.equal(doc.name, "Jay");
 
-      doc.name = "Jaimy";
-      assert.equal(doc.name, "Jaimy");
+      doc.name = ["Jaimy"];
+      assert.equal(doc.name, ["Jaimy"]);
+
+      done();
+    });
+
+    it("type validation- any type", function(done) {
+      d = new Model("testDb", { 
+        name: true,
+      }, { filename: testDb });
+
+      var doc = new d({ name: "Jay" });
+      assert.equal(doc.name, "Jay");
+
+      doc.name = 45;
+      assert.equal(doc.name, 45);
+
+      doc.name = "Tom";
+      assert.equal(doc.name, "Tom");
 
       done();
     });
