@@ -79,7 +79,7 @@ module.exports = function setupSync(model, api, options)
             }],
             push_remote: ["compile_changes", function(callback)
             {
-                status("pushing "+push.length+" changes to remote");
+                if (push.length) status("pushing "+push.length+" changes to remote");
 
                 api.request("datastorePut", _.extend({ }, baseQuery, { changes: 
                     push.map(function(x) { 
@@ -96,7 +96,7 @@ module.exports = function setupSync(model, api, options)
                 {
                     if (err) return callback(err);
 
-                    status("pulled "+results.length+" down");
+                    if (results.length) status("pulled "+results.length+" down");
 
                     results.forEach(function(x) {
                         x._ctime = new Date(x._ctime || 0);
