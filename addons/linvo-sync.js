@@ -23,6 +23,12 @@ module.exports = function setupSync(model, api, options)
     model.on("inserted", function(items, quiet) { if (!quiet) triggerSync() });
     model.static("triggerSync", triggerSync);
 
+    var mtimes = {};
+    model.on("reset", function() { mtimes = {} });
+    model.on("refresh", function() { triggerSync() });
+    model.on("construct", function(x) { if (x._id && x._mtime) mtimes[x._id] = x._mtime });
+    model.on("persist", function(x) { if (x._id && x._mtime) mtimes[x._id] = x._mtime });
+
     /* We need to run only one task at a time */
     var q = async.queue(function(opts, cb)
     {
@@ -33,6 +39,11 @@ module.exports = function setupSync(model, api, options)
         var remote = {}, push = [], pull = [];
 
         async.auto({
+            ensure_indexes: function(callback) { // Meaningless lookup to Ensure the DB has been indexed
+                model.count({ }, function(err, c) { 
+                    callback();
+                });
+            },
             retrieve_remote: function(callback)
             {
                 api.request("datastoreMeta", baseQuery, function(err, meta)
@@ -45,22 +56,26 @@ module.exports = function setupSync(model, api, options)
             },
             compile_changes: ["retrieve_remote", function(callback)
             {
-                model.find({ }, function(err, results)
-                {
+                var pushIds = [];
+                Object.keys(mtimes).forEach(function(id) {
+                    var mtime = mtimes[id];
+                    if ((remote[id] || 0) > mtime.getTime()) pull.push(id);
+                    if ((remote[id] || 0) < mtime.getTime()) pushIds.push(id);
+                    delete remote[id]; // already processed
+                });
+
+                pull = pull.concat(_.keys(remote)); // add all non-processed to pull queue
+                
+                model.find({ _id: { $in: pushIds } }, function(err, res) {
                     if (err) return callback(err);
 
-                    results.forEach(function(r) {
-                        if ((remote[r._id] || 0) > r._mtime.getTime()) pull.push(r._id);
-                        if ((remote[r._id] || 0) < r._mtime.getTime()) push.push(r);
-                        delete remote[r._id]; // already processed
-                    });
-                    pull = pull.concat(_.keys(remote)); // add all non-processed to pull queue
+                    push = res;
                     callback();
+                },true)
 
-                    // It's correct to mark the DB before commiting the changes, but when compiling the list of changes
-                    // Until the changes are commited, more changes might occur
-                    dirty = false;                
-                }, true);
+                // It's correct to mark the DB before commiting the changes, but when compiling the list of changes
+                // Until the changes are commited, more changes might occur
+                dirty = false;
             }],
             push_remote: ["compile_changes", function(callback)
             {
