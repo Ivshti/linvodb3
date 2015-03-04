@@ -2,7 +2,8 @@
 
 ![Linvo Logo](https://launchrock-assets.s3.amazonaws.com/logo-files/8FZQMF2G_1388280616887.png)
 
-Linvo DB is a full-feature embedded database using LevelUP as storage. The interface is MongoDB/Mongoose-like.
+LinvoDB is a full-feature embedded database using LevelUP as storage. It provides MongoDB+Mongoose-like features and interface.
+
 It supports:
 * MongoDB-style queries and update modifiers
 * Atomic updating
