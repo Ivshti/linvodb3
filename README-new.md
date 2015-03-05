@@ -12,7 +12,7 @@ Features:
 * Auto-indexing
 * Live queries - make the query, get constantly up-to-date results
 * Schemas - built-in schema support
-* Efficient map / reduce
+* Efficient Map / Reduce
 
 Relationship to NeDB
 --------------------
@@ -76,10 +76,10 @@ doc.save(function(err) {
 
 // Insert document(s)
 // you can use the .insert method to insert one or more documents
-db.insert({ a: 3 }, function (err, newDoc) {
+Doc.insert({ a: 3 }, function (err, newDoc) {
 	console.log(newDoc._id);
 });
-db.insert([{ a: 3 }, { a: 42 }], function (err, newDocs) {
+Doc.insert([{ a: 3 }, { a: 42 }], function (err, newDocs) {
 	// Two documents were inserted in the database
 	// newDocs is an array with these documents, augmented with their _id
 
@@ -89,7 +89,7 @@ db.insert([{ a: 3 }, { a: 42 }], function (err, newDocs) {
 
 // Save document(s)
 // save is like an insert, except it allows saving existing document too
-db.save([ doc, { a: 55, test: ".save is handy" } ], function(err, docs) { 
+Doc.save([ doc, { a: 55, test: ".save is handy" } ], function(err, docs) { 
 	// docs[0] is doc
 	// docs[1] is newly-inserted document with a=55 and has an assigned _id
 
@@ -99,6 +99,22 @@ db.save([ doc, { a: 55, test: ".save is handy" } ], function(err, docs) {
 
 Querying
 ------------------------
+Use `find` to look for multiple documents matching you query, or `findOne` to look for one specific document. You can select documents based on field equality or use comparison operators (`$lt`, `$lte`, `$gt`, `$gte`, `$in`, `$nin`, `$ne`, `$regex`, `$exists`). You can also use logical operators `$or`, `$and` and `$not`. See below for the syntax.
+
+```javascript
+// Let's say our datastore contains the following collection
+Doc.save([ 
+	{ _id: 'id1', planet: 'Mars', system: 'solar', inhabited: false, satellites: ['Phobos', 'Deimos'] },
+	{ _id: 'id2', planet: 'Earth', system: 'solar', inhabited: true, humans: { genders: 2, eyes: true } },
+	{ _id: 'id3', planet: 'Jupiter', system: 'solar', inhabited: false },
+	{ _id: 'id4', planet: 'Omicron Persei 8', system: 'futurama', inhabited: true, humans: { genders: 7 } },
+	{ _id: 'id5', completeData: { planets: [ { name: 'Earth', number: 3 }, { name: 'Mars', number: 2 }, { name: 'Pluton', number: 9 } ] } }
+], function() { });
+
+
+Doc.find
+```
+
 //basic
 //sort
 //order of execution
