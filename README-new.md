@@ -47,7 +47,7 @@ var Doc = new LinvoDB("doc", { /* schema, can be empty */ })
 Initialization, detailed:
 ```javascript
 var LinvoDB = require("linvodb3");
-avr modelName = "doc";
+var modelName = "doc";
 var schema = { }; // Non-strict always, can be left empty
 var options = { };
 // options.filename = "./test.db"; // Path to database - not necessary 
@@ -67,7 +67,7 @@ If the document does not contain an `_id` field, one will be automatically gener
 
 ```javascript
 // Construct a single document and then save it
-var doc = new Doc({ a: 5 });
+var doc = new Doc({ a: 5, now: new Date(), test: "this is a string" });
 doc.b = 13;
 doc.save(function(err) { 
 	// Document is saved
@@ -75,28 +75,60 @@ doc.save(function(err) {
 });
 
 // Insert document(s)
+// you can use the .insert method to insert one or more documents
+db.insert({ a: 3 }, function (err, newDoc) {
+	console.log(newDoc._id);
+});
+db.insert([{ a: 3 }, { a: 42 }], function (err, newDocs) {
+	// Two documents were inserted in the database
+	// newDocs is an array with these documents, augmented with their _id
 
+	// If there's an unique constraint on 'a', this will fail, and no changes will be made to the DB
+	// err is a 'uniqueViolated' error
+});
 
 // Save document(s)
 // save is like an insert, except it allows saving existing document too
+db.save([ doc, { a: 55, test: ".save is handy" } ], function(err, docs) { 
+	// docs[0] is doc
+	// docs[1] is newly-inserted document with a=55 and has an assigned _id
+
+	// Doing that with .insert would throw an uniqueViolated error for _id on doc, because it assumes all documents are new
+});
 ```
 
 Querying
 ------------------------
+//basic
+//sort
+//order of execution
 
 Map / reduce
 ------------
+//order of execution
+
+Live Queries
+-------------
+// basic
+// events
+// angular disclaimer - debounce - If you plan to use LinvoDB live queries with AngularJS and update the scope on data update, use the liveQueryUpdate event, but please debounce it in order to avoid excessive scope apply calls.
+
+Updating
+---------
+// instance.save
+// model.update
 
 Removing
 ---------
+// instance.remove
+// model.remove
+
 
 Schemas
 ------------
 
-
-Live Queries
--------------
-
+Model - static & instance methods
+-----------
 
 Events
 ------
