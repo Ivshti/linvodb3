@@ -112,7 +112,50 @@ Doc.save([
 ], function() { });
 
 
-Doc.find
+// Finding all planets in the solar system
+Doc.find({ system: 'solar' }, function (err, docs) {
+  // docs is an array containing documents Mars, Earth, Jupiter
+  // If no document is found, docs is equal to []
+});
+
+// Finding all inhabited planets in the solar system
+Doc.find({ system: 'solar', inhabited: true }, function (err, docs) {
+  // docs is an array containing document Earth only
+});
+
+// Use the dot-notation to match fields in subdocuments
+Doc.find({ "humans.genders": 2 }, function (err, docs) {
+  // docs contains Earth
+});
+
+// Use the dot-notation to navigate arrays of subdocuments
+Doc.find({ "completeData.planets.name": "Mars" }, function (err, docs) {
+  // docs contains document 5
+});
+
+Doc.find({ "completeData.planets.name": "Jupiter" }, function (err, docs) {
+  // docs is empty
+});
+
+Doc.find({ "completeData.planets.0.name": "Earth" }, function (err, docs) {
+  // docs contains document 5
+  // If we had tested against "Mars" docs would be empty because we are matching against a specific array element
+});
+
+// You can also deep-compare objects. Don't confuse this with dot-notation!
+Doc.find({ humans: { genders: 2 } }, function (err, docs) {
+  // docs is empty, because { genders: 2 } is not equal to { genders: 2, eyes: true }
+});
+
+// Find all documents in the collection
+Doc.find({}, function (err, docs) {
+});
+
+// The same rules apply when you want to only find one document
+Doc.findOne({ _id: 'id1' }, function (err, doc) {
+  // doc is the document Mars
+  // If no document is found, doc is null
+});
 ```
 
 //basic
