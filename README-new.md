@@ -3,7 +3,7 @@ LinvoDB
 
 LinvoDB is a Node.js/NW.js persistent DB with MongoDB / Mongoose-like features and interface.
 
-Features:
+### Features:
 
 * **MongoDB-like query engine**
 * Persistence built on LevelUP - you can **pick back-end**
@@ -13,6 +13,8 @@ Features:
 * **Live queries** - make the query, get constantly up-to-date results
 * **Schemas** - built-in schema support
 * **Efficient Map / Reduce / Limit**
+
+
 
 Relationship to NeDB
 --------------------
@@ -27,7 +29,7 @@ In general:
 * LinvoDB has live queries, map/reduce and schema support.
 
 
-Install, Initialize, pick back-end
+Install, Initialize, pick backend
 -------------------------
 
 Install:
@@ -375,14 +377,16 @@ Planet.on("liveQueryUpdate", function() {
 	console.log(live.res);
 });
 
-docs[1].inhabited = false; // Earth catastrophe 
-docs[1].save(); // Save Earth
+setTimeout(function() {
+	docs[1].inhabited = false; // Earth catastrophe 
+	docs[1].save(); // Save Earth
+}, 666);
 
 }); // end .save()
 ```
 
 ### Angular Disclaimer
-If you plan to use Live Queries with AngularJS and update scope on the `liveQueryUpdated` event please be careful. First, I recommend using $digest when possible instead of $apply (dirty-check only the current scope). Second, I recommend debouncing the event before running the $scope.$apply() event to avoid $apply being called many times because of heavy DB use at a moment.
+If you plan to use **Live Queries with AngularJS** and update scope on the `liveQueryUpdated` event please be careful. First, I recommend using `$digest` when possible instead of `$apply` (dirty-check only the current scope). Second, I recommend debouncing the event before running the `$scope.$apply()` event to avoid $apply being called many times because of heavy DB use at a moment.
 
 
 Updating
@@ -547,10 +551,11 @@ Planet.remove({ _id: 'id2' }, {}, function (err, numRemoved) {
 Planet.remove({ system: 'solar' }, { multi: true }, function (err, numRemoved) {
   // numRemoved = 3, all planets from the solar system were removed
 });
-
+```
 
 Events
 ---------------
+
 ```javascript
 // Hook-like
 Doc.on('save', function(doc) { }) // Will be called before saving a document - no matter if using save, insert or update methods. You can modify the document in this event, it's essentially a hook
@@ -568,18 +573,18 @@ Doc.on('removed', function(ids) { }) // Called after removing documents is compl
 
 Schemas
 ------
-You can define a schema for a model, allowing you to enforce certain properties to types (String, Number, Date, Array, Object supported), set defaults and also define properties with getter/setter. Since schema support is implemented deep in LinvoDB, you can query on fields which are getter/setter-based and rely that types/defaults are always going to be enforced.
+You can define a schema for a model, allowing you to enforce certain properties to types (String, Number, Date), set defaults and also define properties with getter/setter. Since schema support is implemented deep in LinvoDB, you can query on fields which are getter/setter-based and rely that types/defaults are always going to be enforced.
 
 **NOTE: when constructing a model with a schema, please specify options object after the schema, otherwise schema will be treated as options: `new LinvoDB(name, schema, options)`**
 
 Schemas are defined as an object of specs for each property. The spec can have properties:
 
-* type - the type to be enforced, can be String, Number, Date along with "string", "number", "date" alternative syntax.
-* default - the default value; must comply to the type obviously
-* enumerable - whether this property will be enumerable
-* get - getter, cannot be used with type/default
-* set - setter, cannot be used with type/default
-* index, sparse, unique - booleans, whether to create an index and it's options
+* `type` - the type to be enforced, can be String, Number, Date along with "string", "number", "date" alternative syntax. Can also be a RegExp instance in case you want to validate against that expression.
+* `default` - the default value; must comply to the type obviously
+* `enumerable` - whether this property will be enumerable
+* `get` - getter, cannot be used with type/default
+* `set` - setter, cannot be used with type/default
+* `index`, `sparse`, `unique` - booleans, whether to create an index and it's options
 
 If type is all you need, you can shorthand the property to the type only, e.g. `{ name: String }`.
 You can also define a property as an "array of" by setting it to `[spec]`, for example `[String]` for an array of strings.
@@ -608,8 +613,10 @@ p.name = 23;
 p.created = "10/23/2004"; 
 // p is 23 October 2004, date object
 
-p.favNumbers.push("42"); // favNumbers will be [42] ; the string will be cast to a number
+p.favNumbers.push(22);
+p.favNumbers.push("42"); // favNumbers will be [22, 42] ; the string will be cast to a number
 p.favNumbers.push("forty five"); // nothing happens, can't cast
+// p.favNumbers is [22, 42]
 
 p.name = "John Smith"; 
 // p.firstName is "John"
@@ -633,11 +640,10 @@ Model - static & instance methods
 doc.remove(function(err) { /* removes the document*/ })
 doc.save(function(err) { /* saves the document*/ })
 doc.copy(); // returns a copy of the document
-
 ```
 
 You can define additional functions for both the model and the document instances.
-```
+```javascript
 Planet.static("findAllSolar", function(cb) { return Planet.find({ system: 'solar' }).exec(cb) });
 Planet.findAllSolar(function(err,res) {  /* res is all planets in the solar system */  });
 
@@ -660,7 +666,7 @@ The full syntax is `Doc.ensureIndex(options, cb)`, where callback is optional an
 
 You can remove a previously created index with `Doc.removeIndex(fieldName, cb)`.
 
-**NOTE** compound indexes are currently not supported.
+**NOTE compound indexes are currently not supported.**
 
 
 
@@ -669,6 +675,8 @@ License
 See [License](LICENSE)
 
 
-Donate
+Help / Donate
 -------------
+Pull requests are always welcome.
+
 LinvoDB is open source and free to use, but if you found it useful in your project you can donate to ensure the continued support for LinvoDB at this BTC address: 1HpJjJbrZ2RH9cZkJPdzqVndGEDrBK5Hat
