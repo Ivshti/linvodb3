@@ -388,7 +388,6 @@ If you plan to use Live Queries with AngularJS and update scope on the `liveQuer
 Updating
 --------------
 
-
 ### Re-saving a document
 `doc.save()` - you can use `save` on a document instance to re-save it, therefore updating it.
 ```javascript
@@ -518,8 +517,10 @@ Removing
 ### Removing a document instance
 ```javascript
 // if you have the document instance at hand, you can just
-doc.remove(function() {
-	// done
+Doc.findOne({ planet: 'Mars' }, function(err, doc) {
+	doc.remove(function() {
+		// done
+	});	
 });
 ```
 
@@ -548,36 +549,57 @@ Planet.remove({ system: 'solar' }, { multi: true }, function (err, numRemoved) {
 });
 
 
-Schemas
+Events
 ---------------
-
 ```javascript
 // Hook-like
 Doc.on('save', function(doc) { }) // Will be called before saving a document - no matter if using save, insert or update methods. You can modify the document in this event, it's essentially a hook
 Doc.on('insert', function(doc) { }) // Will be called before saving a new document - again, no matter if using save/insert/update methods. You can modify the document in this event
 Doc.on('remove', function(doc) { }) // Before removing a document; called with the document about to be removed
+
 Doc.on('construct', function(doc) { }) // When a document is constructed
 
 // After operation is complete
 Doc.on('inserted', function(docs) { }) // Called after inserting new documents is complete; docs is an array of documents
 Doc.on('updated', function(docs) { }) // Called after updating documents is complete; docs is an array of documents
 Doc.on('removed', function(ids) { }) // Called after removing documents is complete; ids is an array of ids
-
 ```
+
+
+Schemas
+------
+You can define a schema for a model, allowing you to enforce certain properties to types (String, Number, Date, Array, Object supported), set defaults and also define properties with getter/setter. Since schema support is implemented deep in LinvoDB, you can query on fields which are getter/setter-based and rely that types/defaults are always going to be enforced.
 
 
 Model - static & instance methods
 -----------
+```javascript
+// var doc = new Doc(); // create a new instance
+// Or get it from query results
 
-// remove, save, copy
+doc.remove(function(err) { /* removes the document*/ })
+doc.save(function(err) { /* saves the document*/ })
+doc.copy(); // returns a copy of the document
 
+```
 
-Events
-------
+You can define additional functions for both the model and the document instances.
+
 
 
 Indexing
 ----------
+Indexing in LinvoDB is automatic, although you can turn that off (`{autoindex: false}` in model options, not recommended). Defining indexes, in case you need you enforce a unique constraint, happens with `Doc.ensureIndex({ fieldName: "name", unique: true })`. 
+
+The full syntax is `Doc.ensureIndex(options, cb)`, where callback is optional and get passed an error if any (usually a unique constraint that was violated). `ensureIndex` can be called when you want, even after some data was inserted, though it's best to call it at application startup. The options are:  
+
+* **fieldName** (required): name of the field to index. Use the dot notation to index a field in a nested document.
+* **unique** (optional, defaults to `false`): enforce field uniqueness. Note that a unique index will raise an error if you try to index two documents for which the field is not defined.
+* **sparse** (optional, defaults to `false`): don't index documents for which the field is not defined. Use this option along with "unique" if you want to accept multiple documents for which it is not defined.
+
+You can remove a previously created index with `Doc.removeIndex(fieldName, cb)`.
+
+**NOTE** compound indexes are currently not supported.
 
 
 Donate
