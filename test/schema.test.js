@@ -249,7 +249,7 @@ describe('Schema', function () {
         department: { index: false },
         address: { city: { index: true } },
         tags: ["string"],
-        hits: ["number"],
+        hits: [Number],
         addons: []
       }, { filename: testDb });
 

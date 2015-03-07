@@ -570,6 +570,59 @@ Schemas
 ------
 You can define a schema for a model, allowing you to enforce certain properties to types (String, Number, Date, Array, Object supported), set defaults and also define properties with getter/setter. Since schema support is implemented deep in LinvoDB, you can query on fields which are getter/setter-based and rely that types/defaults are always going to be enforced.
 
+**NOTE: when constructing a model with a schema, please specify options object after the schema, otherwise schema will be treated as options: `new LinvoDB(name, schema, options)`**
+
+Schemas are defined as an object of specs for each property. The spec can have properties:
+
+* type - the type to be enforced, can be String, Number, Date along with "string", "number", "date" alternative syntax.
+* default - the default value; must comply to the type obviously
+* enumerable - whether this property will be enumerable
+* get - getter, cannot be used with type/default
+* set - setter, cannot be used with type/default
+* index, sparse, unique - booleans, whether to create an index and it's options
+
+If type is all you need, you can shorthand the property to the type only, e.g. `{ name: String }`.
+You can also define a property as an "array of" by setting it to `[spec]`, for example `[String]` for an array of strings.
+Nested objects are supported.
+
+```javascript
+var Person = new LinvoDB("person", { 
+	name: { type: String, default: "nameless" }, // default value
+	age: Number, // shorthand to { type: ... }
+	created: Date, 
+	address: { // nested object
+		line1: String,
+		line2: String
+	},
+	department: { type: String, index: true }, // you can use the schema spec to define indexes
+	favNumbers: [Number], // array of
+	firstName: { get: function() { return this.name.split(" ")[0] } }
+}, { });
+
+var p = new Person();
+// p is { name: 'nameless', age: 0, created: /* date when created */, address: { line1: "", line2: "" }, favNumbers: [] }
+
+p.name = 23;
+// p.name becomes "23"
+
+p.created = "10/23/2004"; 
+// p is 23 October 2004, date object
+
+p.favNumbers.push("42"); // favNumbers will be [42] ; the string will be cast to a number
+p.favNumbers.push("forty five"); // nothing happens, can't cast
+
+p.name = "John Smith"; 
+// p.firstName is "John"
+
+p.save(function() { 
+	// Person is saved
+	// You can even query on virtual properties
+
+	Person.find({ firstName: "John" }, function(err, res) { /* res will be [p] */ });
+});
+```
+
+
 
 Model - static & instance methods
 -----------
@@ -584,7 +637,15 @@ doc.copy(); // returns a copy of the document
 ```
 
 You can define additional functions for both the model and the document instances.
+```
+Planet.static("findAllSolar", function(cb) { return Planet.find({ system: 'solar' }).exec(cb) });
+Planet.findAllSolar(function(err,res) {  /* res is all planets in the solar system */  });
 
+Planet.method("findSameSystem", function(cb) { return Planet.find({ system: this.system }).exec(cb) });
+Planet.findOne({ planet: 'Earth' }, function(err, doc) {
+	doc.findSameSystem(function(err,res) { /* res is all planets in the solar system */ })
+});
+```
 
 
 Indexing
@@ -602,6 +663,12 @@ You can remove a previously created index with `Doc.removeIndex(fieldName, cb)`.
 **NOTE** compound indexes are currently not supported.
 
 
+
+License 
+-------------
+See [License](LICENSE)
+
+
 Donate
 -------------
-LinvoDB is open source and free to use, but if you found it useful in your project you can donate to ensure the continued support for LinvoDB at this BTC address: 
+LinvoDB is open source and free to use, but if you found it useful in your project you can donate to ensure the continued support for LinvoDB at this BTC address: 1HpJjJbrZ2RH9cZkJPdzqVndGEDrBK5Hat
