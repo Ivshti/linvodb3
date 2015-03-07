@@ -5,14 +5,14 @@ LinvoDB is a Node.js/NW.js persistent DB with MongoDB / Mongoose-like features a
 
 Features:
 
-* MongoDB-like query engine
-* Persistence built on LevelUP - you can pick back-end
-* NW.js friendly - JS-only backend is (Medea)[https://github.com/medea/medea]
-* Performant - steady performance unaffected by DB size - queries are always indexed
+* **MongoDB-like query engine**
+* Persistence built on LevelUP - you can **pick back-end**
+* **NW.js friendly** - JS-only backend is [Medea](https://github.com/medea/medea)
+* **Performant** - steady performance unaffected by DB size - queries are always indexed
 * Auto-indexing
-* Live queries - make the query, get constantly up-to-date results
-* Schemas - built-in schema support
-* Efficient Map / Reduce
+* **Live queries** - make the query, get constantly up-to-date results
+* **Schemas** - built-in schema support
+* **Efficient Map / Reduce / Limit**
 
 Relationship to NeDB
 --------------------
@@ -132,10 +132,6 @@ Planet.find({ "humans.genders": 2 }, function (err, docs) {
 // Use the dot-notation to navigate arrays of subdocuments
 Planet.find({ "completeData.planets.name": "Mars" }, function (err, docs) {
   // docs contains document 5
-});
-
-Planet.find({ "completeData.planets.name": "Jupiter" }, function (err, docs) {
-  // docs is empty
 });
 
 Planet.find({ "completeData.planets.0.name": "Earth" }, function (err, docs) {
@@ -292,10 +288,13 @@ Before seeing the examples, you should know that **you can combine any of these 
 No matter how you combine those modifiers, the order of execution is: *query, filter, sort, limit/skip, map, reduce, aggregate*.
 
 The basic syntax is 
-``Cursor.map(function(val){ return val })``
-``Cursor.reduce(function reducer(a,b), initial);``
-``Cursor.filter(function(val) { return true /* or false*/ }); // truthy / falsy values accepted``
-``Cursor.aggregate(function(res) { /* do something to the result of the query right before serving */ return res })``
+`Cursor.map(function(val){ return val })`
+
+`Cursor.reduce(function reducer(a,b), initial);`
+
+`Cursor.filter(function(val) { return true /* or false*/ }); // truthy / falsy values accepted`
+
+`Cursor.aggregate(function(res) { /* do something to the result of the query right before serving */ return res })`
 
 ```javascript
 // Let's assume this dataset
@@ -352,8 +351,8 @@ Planet.find({ system: "solar" }) // we have Mars, Earth, Jupiter remaining
 
 Live Queries
 -------------
-Once you have a `Cursor` object, returned by calling `find` without a callback, you can turn it into a live query, meaning the .res property will always be up-to-date results from the query. Of course, all modifiers, such as `limit`, `skip`, `sort`, `map`, `reduce`, `filter` and `aggregate` will still apply.
-An event will be emitted when the result is updated - `liveQueryUpdated`.
+Once you have a `Cursor` object, returned by calling `find` without a callback, you can turn it into a live query, meaning the `.res` property will always be up-to-date results from the query. Of course, all modifiers, such as `limit`, `skip`, `sort`, `map`, `reduce`, `filter` and `aggregate` will still apply.
+An event will be emitted when the result is updated - `liveQueryUpdate` on the model itself.
 
 // basic
 // events
