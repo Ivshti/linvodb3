@@ -279,18 +279,14 @@ db.count({ system: 'solar' }, function (err, count) {
   // count equals to 3
 });
 
-// Count all documents in the datastore
-db.count({}, function (err, count) {
-  // count equals to 4
-});
-
 // Count all documents in the datastore via cursor
 db.find({}).count(function (err, count) {
   // count equals to 4
+});
 ```
 
 
-### Map/Reduce
+### Map / Reduce / Filter
 
 
 ### Events
