@@ -289,15 +289,6 @@ db.find({}).count(function (err, count) {
 ### Map / Reduce / Filter
 
 
-### Events
-- insert - only before a new doc is inserted in DB
-- save - saved before any object is persisted to DB
-- inserted
-- updated
-- remove
-- removed
-- saved
-- construct
 
 ### Updating documents
 `db.update(query, update, options, callback)` will update all documents matching `query` according to the `update` rules:  
@@ -432,6 +423,18 @@ db.remove({ system: 'solar' }, { multi: true }, function (err, numRemoved) {
   // All planets from the solar system were removed
 });
 ```
+
+
+### Events
+- insert - only before a new doc is inserted in DB
+- save - saved before any object is persisted to DB
+- inserted
+- updated
+- remove
+- removed
+- saved
+- construct
+
 
 ### Events 
 ```javascript
