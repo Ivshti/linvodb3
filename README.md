@@ -672,6 +672,12 @@ You can remove a previously created index with `Doc.removeIndex(fieldName, cb)`.
 
 
 
+Utilization
+-------------
+**[Cinematic](http://cinematic.li)** - LinvoDB was created specifically because NeDB started to behave suboptimally with >300 movie/series metadata objects, which were pretty large. Reduced memory usage from ~500MB to ~100MB. Live queries, schemas and map/reduce helped create a much cleaner codebase.
+
+_If you wish to add something here, contact me at ivo@linvo.com_
+
 License 
 -------------
 See [License](LICENSE)
