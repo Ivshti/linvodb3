@@ -25,8 +25,10 @@ In general:
 * LinvoDB is better for large datasets (many objects, or large objects) because it doesn't keep the whole DB in memory and doesn't need to always scan it
 * LinvoDB does the entire query through the indexes, NeDB scans the DB
 * Both LinvoDB and NeDB play well with NW.js (node-webkit). LinvoDB can be initialized with the JS-only MedeaDown back-end.
-* NeDB is ultra-fast because the DB is in memory, LinvoDB's performance is comparible to MongoDB
+* NeDB is ultra-fast because the DB is in memory, LinvoDB's performance is comparible to MongoDB. LinvoDB is faster for large datasets.
 * LinvoDB has live queries, map/reduce and schema support.
+* Both LinvoDB and NeDB are unsuitable for huge datasets (big data)
+* Combining NeDB's in-memory data and LinvoDB's full-indexed queries would yield even better performance. If you want to sacrifice memory for query performance, you can use LinvoDB with a backend that works like that or with LevelDB + increased LRU cache
 
 
 Install, Initialize, pick backend
