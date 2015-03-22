@@ -81,6 +81,8 @@ module.exports = function setupSync(model, api, options)
             {
                 if (push.length) status("pushing "+push.length+" changes to remote for "+model.modelName);
 
+                if (! push.length) return callback();
+
                 api.request("datastorePut", _.extend({ }, baseQuery, { changes: 
                     push.map(function(x) { 
                         var item = _.extend({ }, x);
@@ -92,6 +94,8 @@ module.exports = function setupSync(model, api, options)
             }],
             pull_local: ["compile_changes", function(callback)
             {
+                if (! pull.length) return callback();
+                
                 api.request("datastoreGet", _.extend({ }, baseQuery, { ids: pull }), function(err, results)
                 {
                     if (err) return callback(err);
