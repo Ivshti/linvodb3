@@ -505,10 +505,12 @@ describe('Schema', function () {
       new d({ name: "Jan", age: 32 }).save(function(err, doc){
         assert.isNull(err);
 
+        console.log(util.isDate(doc._ctime));
         util.isDate(doc._ctime).should.equal(true);
         util.isDate(doc._mtime).should.equal(true);
 
         setTimeout(function()  {
+          var original = doc.copy();
           doc.save(function(err, doc1) {
             d.findOne({ _id: doc1._id }, function(err,doc2) {
               assert.isNull(err);
@@ -516,8 +518,8 @@ describe('Schema', function () {
               util.isDate(doc2._ctime).should.equal(true);
               util.isDate(doc2._mtime).should.equal(true);
 
-              assert.isTrue(doc2._ctime.getTime() == doc._ctime.getTime());
-              assert.isTrue(doc2._mtime.getTime() != doc._mtime.getTime());
+              assert.isTrue(doc2._ctime.getTime() == original._ctime.getTime());
+              assert.isTrue(doc2._mtime.getTime() != original._mtime.getTime());
 
               d.on("remove", function(doc) { if (doc._id == doc1._id) done() });
               doc2.remove();
