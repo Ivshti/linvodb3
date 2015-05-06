@@ -505,7 +505,6 @@ describe('Schema', function () {
       new d({ name: "Jan", age: 32 }).save(function(err, doc){
         assert.isNull(err);
 
-        console.log(util.isDate(doc._ctime));
         util.isDate(doc._ctime).should.equal(true);
         util.isDate(doc._mtime).should.equal(true);
 
