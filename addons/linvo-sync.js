@@ -27,7 +27,7 @@ module.exports = function setupSync(model, api, options)
     model.on("reset", function() { mtimes = {} });
     model.on("refresh", function() { triggerSync() });
     model.on("construct", function(x) { if (x._id && x._mtime) mtimes[x._id] = x._mtime });
-    model.on("persist", function(x) { if (x._id && x._mtime) mtimes[x._id] = x._mtime });
+    model.on("save", function(x) { if (x._id && x._mtime) mtimes[x._id] = x._mtime });
 
     /* We need to run only one task at a time */
     var q = async.queue(function(opts, cb)
