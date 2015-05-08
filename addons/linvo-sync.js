@@ -54,7 +54,7 @@ module.exports = function setupSync(model, api, options)
                     callback();
                 });
             },
-            compile_changes: ["retrieve_remote", function(callback)
+            compile_changes: ["ensure_indexes", "retrieve_remote", function(callback)
             {
                 var pushIds = [];
                 Object.keys(mtimes).forEach(function(id) {
