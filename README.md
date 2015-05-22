@@ -1,13 +1,13 @@
 LinvoDB
 =========
 
-LinvoDB is a Node.js/NW.js persistent DB with MongoDB / Mongoose-like features and interface.
+LinvoDB is a Node.js/NW.js/Electron persistent DB with MongoDB / Mongoose-like features and interface.
 
 ### Features:
 
 * **MongoDB-like query engine**
 * Persistence built on LevelUP - you can **pick back-end**
-* **NW.js friendly** - JS-only backend is [Medea](https://github.com/medea/medea)
+* **NW.js/Electron friendly** - JS-only backend is [Medea](https://github.com/medea/medea)
 * **Performant** - steady performance unaffected by DB size - queries are always indexed
 * Auto-indexing
 * **Live queries** - make the query, get constantly up-to-date results
