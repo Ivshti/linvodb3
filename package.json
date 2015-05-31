@@ -37,7 +37,8 @@
     "sinon": "1.3.x",
     "exec-time": "0.0.2",
     "commander": "1.1.1",
-    "rimraf": "2.2.x"
+    "rimraf": "2.2.x",
+    "leveldown": "0.10.x"
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec --timeout 10000"
