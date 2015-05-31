@@ -1897,7 +1897,7 @@ describe('Database', function () {
           function(cb) { d.update({ a: { $in: [4, 5, 'abc'] } }, { $inc: { a: 1 } }, { multi: true }, cb) }     
         ]     
          , function (err) {
-          assert.isNull(err);
+          assert.isUndefined(err);
 
           d.findOne({  }, function(err,doc) {
             doc.a.should.equal(6);
@@ -2602,7 +2602,7 @@ describe('Database', function () {
                   , doc2 = _.find(data, function (doc) { return doc._id === _doc2._id; })
                   ;
 
-                assert.isNull(err);
+                assert.isUndefined(err);
                 nr.should.equal(1);
 
                 data.length.should.equal(2);
@@ -2617,7 +2617,7 @@ describe('Database', function () {
                       , doc2 = _.find(data, function (doc) { return doc._id === _doc2._id; })
                       ;
 
-                    assert.isNull(err);
+                    assert.isUndefined(err);
                     nr.should.equal(2);
 
                     data.length.should.equal(2);
