@@ -844,6 +844,46 @@ describe('Cursor', function () {
   });   // ==== End of 'Map / Reduce' ====
 
 
+  
+  describe('Streaming cursor', function () {
+
+    var doc0,doc1,doc2,doc3,doc4;
+    beforeEach(function (done) {
+      // We don't know the order in which docs wil be inserted but we ensure correctness by testing both sort orders
+      d.insert({ age: 5, name: 'Jo', planet: 'B' }, function (err, _doc0) {
+        doc0 = _doc0;
+        d.insert({ age: 57, name: 'Louis', planet: 'R' }, function (err, _doc1) {
+          doc1 = _doc1;
+          d.insert({ age: 52, name: 'Grafitti', planet: 'C' }, function (err, _doc2) {
+            doc2 = _doc2;
+            d.insert({ age: 23, name: 'LM', planet: 'S' }, function (err, _doc3) {
+              doc3 = _doc3;
+              d.insert({ age: 89, planet: 'Earth' }, function (err, _doc4) {
+                doc4 = _doc4;
+                return done();
+              });
+            });
+          });
+        });
+      });
+    });
+
+    it('basic test', function (done) {
+      var cursor = new Cursor(d, {});
+      cursor.sort({ age: 1 });   // For easier finding
+
+      var items  = [];
+      cursor.stream(function(d) {
+        items.push(d);
+      }, function() { 
+        items.length.should.equal(5);
+        done();
+      });
+    });
+
+  });   // ==== End of 'Streaming cursor' ====
+
+
   describe('getMatchesStream', function() {
     // Comparison operators: $lt $lte $gt $gte $ne $in $nin $regex $exists $size 
     // Logical operators: $or $and $not $where
