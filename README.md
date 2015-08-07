@@ -14,6 +14,10 @@ LinvoDB is a Node.js/NW.js/Electron persistent DB with MongoDB / Mongoose-like f
 * **Schemas** - built-in schema support
 * **Efficient Map / Reduce / Limit**
 
+### Coming soon:
+
+* **Streaming cursors**
+* **Distributed dataset**
 
 
 Relationship to NeDB
