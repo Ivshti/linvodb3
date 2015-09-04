@@ -93,7 +93,7 @@ describe('Cursor', function () {
       }
       ], done);
     });
-    
+
     it('With an empty collection', function (done) {
       async.waterfall([
         function (cb) {
@@ -109,7 +109,7 @@ describe('Cursor', function () {
         }
       ], done);
     });
-    
+
     it('With a limit', function (done) {
       var cursor = new Cursor(d);
       cursor.limit(3);
@@ -148,7 +148,7 @@ describe('Cursor', function () {
         done();
       });
     });
-    
+
     it('With a filter, catch the error in the filter', function (done) {
       var cursor = new Cursor(d);
       cursor.filter(function(x) { return blablabla }).count(function (err, c) {
@@ -158,7 +158,7 @@ describe('Cursor', function () {
         done();
       });
     });
-    
+
     it('With a limit and a skip and method chaining', function (done) {
       var cursor = new Cursor(d);
       cursor.limit(4).skip(3);   // Only way to know that the right number of results was skipped is if limit + skip > number of results
@@ -213,7 +213,7 @@ describe('Cursor', function () {
         for (i = 0; i < docs.length - 1; i += 1) {
           assert(docs[i].age < docs[i + 1].age)
         }
-        
+
         cursor.sort({ age: -1 });
         cursor.exec(function (err, docs) {
           assert.isNull(err);
@@ -223,10 +223,10 @@ describe('Cursor', function () {
           }
 
           done();
-        });          
+        });
       });
     });
-    
+
     it('With an empty collection', function (done) {
       async.waterfall([
         function (cb) {
@@ -243,9 +243,9 @@ describe('Cursor', function () {
         }
       ], done);
     });
-    
+
     it('Ability to chain sorting and exec', function (done) {
-      var i;    
+      var i;
       async.waterfall([
         function (cb) {
           var cursor = new Cursor(d);
@@ -273,7 +273,7 @@ describe('Cursor', function () {
     });
 
     it('Using limit and sort', function (done) {
-      var i;    
+      var i;
       async.waterfall([
         function (cb) {
           var cursor = new Cursor(d);
@@ -300,7 +300,7 @@ describe('Cursor', function () {
     });
 
     it('Using a limit higher than total number of docs shouldnt cause an error', function (done) {
-      var i;    
+      var i;
       async.waterfall([
         function (cb) {
           var cursor = new Cursor(d);
@@ -319,7 +319,7 @@ describe('Cursor', function () {
     });
 
     it('Using limit and skip with sort', function (done) {
-      var i;    
+      var i;
       async.waterfall([
         function (cb) {
           var cursor = new Cursor(d);
@@ -353,9 +353,9 @@ describe('Cursor', function () {
         }
       ], done);
     });
-    
+
     it('Using too big a limit and a skip with sort', function (done) {
-      var i;    
+      var i;
       async.waterfall([
         function (cb) {
           var cursor = new Cursor(d);
@@ -372,7 +372,7 @@ describe('Cursor', function () {
     });
 
     it('Using too big a skip with sort should return no result', function (done) {
-      var i;    
+      var i;
       async.waterfall([
         function (cb) {
           var cursor = new Cursor(d);
@@ -408,7 +408,7 @@ describe('Cursor', function () {
         }
       ], done);
     });
-    
+
     it('Sorting strings', function (done) {
       async.waterfall([
         function (cb) {
@@ -420,7 +420,7 @@ describe('Cursor', function () {
                 d.insert({ name: 'sue' }, function () {
                   return cb();
                 });
-              });            
+              });
             });
           });
         }
@@ -446,10 +446,10 @@ describe('Cursor', function () {
         }
       ], done);
     });
-    
+
     it('Sorting nested fields with dates', function (done) {
       var doc1, doc2, doc3;
-      
+
       async.waterfall([
         function (cb) {
           d.remove({}, { multi: true }, function (err) {
@@ -463,7 +463,7 @@ describe('Cursor', function () {
                   doc3 = _doc3;
                   return cb();
                 });
-              });            
+              });
             });
           });
         }
@@ -489,8 +489,8 @@ describe('Cursor', function () {
         }
       ], done);
     });
-    
-    it('Sorting when some fields are undefined', function (done) {      
+
+    it('Sorting when some fields are undefined', function (done) {
       async.waterfall([
         function (cb) {
           d.remove({}, { multi: true }, function (err) {
@@ -503,7 +503,7 @@ describe('Cursor', function () {
                     return cb();
                   });
                 });
-              });            
+              });
             });
           });
         }
@@ -535,8 +535,8 @@ describe('Cursor', function () {
         }
       ], done);
     });
-    
-    it('Sorting when all fields are undefined', function (done) {      
+
+    it('Sorting when all fields are undefined', function (done) {
       async.waterfall([
         function (cb) {
           d.remove({}, { multi: true }, function (err) {
@@ -547,7 +547,7 @@ describe('Cursor', function () {
                 d.insert({ name: 'sue' }, function () {
                   return cb();
                 });
-              });            
+              });
             });
           });
         }
@@ -583,7 +583,7 @@ describe('Cursor', function () {
                     });
                   });
                 });
-              });            
+              });
             });
           });
         }
@@ -591,7 +591,7 @@ describe('Cursor', function () {
           var cursor = new Cursor(d, {});
           cursor.sort({ name: 1, age: -1 }).exec(function (err, docs) {
             docs.length.should.equal(5);
-            
+
             docs[0].nid.should.equal(2);
             docs[1].nid.should.equal(1);
             docs[2].nid.should.equal(5);
@@ -604,7 +604,7 @@ describe('Cursor', function () {
           var cursor = new Cursor(d, {});
           cursor.sort({ name: 1, age: 1 }).exec(function (err, docs) {
             docs.length.should.equal(5);
-            
+
             docs[0].nid.should.equal(2);
             docs[1].nid.should.equal(5);
             docs[2].nid.should.equal(1);
@@ -617,7 +617,7 @@ describe('Cursor', function () {
           var cursor = new Cursor(d, {});
           cursor.sort({ age: 1, name: 1 }).exec(function (err, docs) {
             docs.length.should.equal(5);
-            
+
             docs[0].nid.should.equal(3);
             docs[1].nid.should.equal(4);
             docs[2].nid.should.equal(5);
@@ -630,7 +630,7 @@ describe('Cursor', function () {
           var cursor = new Cursor(d, {});
           cursor.sort({ age: 1, name: -1 }).exec(function (err, docs) {
             docs.length.should.equal(5);
-            
+
             docs[0].nid.should.equal(3);
             docs[1].nid.should.equal(4);
             docs[2].nid.should.equal(5);
@@ -646,12 +646,12 @@ describe('Cursor', function () {
         , companies = [ 'acme', 'milkman', 'zoinks' ]
         , entities = []
         ;
-    
+
       async.waterfall([
         function (cb) {
           d.remove({}, { multi: true }, function (err) {
             if (err) { return cb(err); }
-            
+
             id = 1;
             for (i = 0; i < companies.length; i++) {
               for (j = 5; j <= 100; j += 5) {
@@ -688,7 +688,7 @@ describe('Cursor', function () {
 
   });   // ===== End of 'Sorting' =====
 
-  
+
   describe('Map / Reduce', function () {
     var doc1, doc2, doc3, doc4, doc0;
 
@@ -717,7 +717,7 @@ describe('Cursor', function () {
       var cursor = new Cursor(d, {});
       cursor.sort({ age: 1 });   // For easier finding
 
-      cursor.map(function(x) { 
+      cursor.map(function(x) {
         return _.pick(x, "age", "name")
       });
       cursor.exec(function (err, docs) {
@@ -782,7 +782,7 @@ describe('Cursor', function () {
 
         done();
       });
-    });  
+    });
 
     it('map/reduce only mode', function (done) {
       var cursor = new Cursor(d, {});
@@ -840,11 +840,11 @@ describe('Cursor', function () {
 
         done();
       });
-    });    
+    });
   });   // ==== End of 'Map / Reduce' ====
 
 
-  
+
   describe('Streaming cursor', function () {
 
     var doc0,doc1,doc2,doc3,doc4;
@@ -875,7 +875,7 @@ describe('Cursor', function () {
       var items  = [];
       cursor.stream(function(d) {
         items.push(d);
-      }, function() { 
+      }, function() {
         items.length.should.equal(5);
         done();
       });
@@ -885,7 +885,7 @@ describe('Cursor', function () {
 
 
   describe('getMatchesStream', function() {
-    // Comparison operators: $lt $lte $gt $gte $ne $in $nin $regex $exists $size 
+    // Comparison operators: $lt $lte $gt $gte $ne $in $nin $regex $exists $size
     // Logical operators: $or $and $not $where
     // We need to test all operators supported by getMatches
 
@@ -894,7 +894,7 @@ describe('Cursor', function () {
       d.insert([
         { age: 27, name: "Kelly", department: "support" },
         { age: 31, name: "Jim", department: "sales" },
-        { age: 33, name: "Dwight", department: "sales" }, 
+        { age: 33, name: "Dwight", department: "sales" },
         { age: 45, name: "Michael", department: "management" },
         { age: 46, name: "Toby", department: "hr" },
         { age: 45, name: "Phyllis", department: "sales" },
@@ -910,11 +910,11 @@ describe('Cursor', function () {
       var ev = [];
       stream.on("ids", function() { ev.push("ids"); });
       stream.on("data", function(d) { ev.push("data"); });
-      stream.on("ready", function() { 
+      stream.on("ready", function() {
         ev.push("ready");
 
         assert.deepEqual(ev,["ids", "data", "data", "data", "data", "data", "data", "data", "ready"]);
-        
+
         done();
       });
 
@@ -926,7 +926,7 @@ describe('Cursor', function () {
       var ev = [];
       stream.on("ids", function() { ev.push("ids"); });
       stream.on("data", function(d) { ev.push("data"); stream.close(); });
-      stream.on("ready", function() { 
+      stream.on("ready", function() {
         ev.push("ready");
 
         assert.deepEqual(ev,["ids", "data", "ready"]);
@@ -938,15 +938,15 @@ describe('Cursor', function () {
         ev = [];
         stream.on("ids", function() { ev.push("ids"); stream.close(); });
         stream.on("data", function(d) { ev.push("data"); });
-        stream.on("ready", function() { 
+        stream.on("ready", function() {
           ev.push("ready");
 
           assert.deepEqual(ev, ["ids", "ready"]);
-          
+
           done();
         });
       });
-    }); 
+    });
 
 
     it('intercept the default trigger, call it manually', function (done) {
@@ -957,14 +957,14 @@ describe('Cursor', function () {
       var ev = [];
       stream.on("ids", function(ids) { ev.push("ids"); stream.trigger(ids.slice(0,3)) });
       stream.on("data", function(d) { ev.push("data"); });
-      stream.on("ready", function() { 
+      stream.on("ready", function() {
         ev.push("ready");
 
         assert.deepEqual(ev,["ids", "data", "data", "data", "ready"]);
 
         done();
       });
-    }); 
+    });
 
 
     it('lock/unlock value from the stream', function (done) {
@@ -992,16 +992,16 @@ describe('Cursor', function () {
 
       });
 
-    });       
+    });
   });  // ===== End of 'getMatches' =====
 
-  
+
   describe("Live query", function() {
     beforeEach(function(done) {
       d.insert([
         { age: 27, name: "Kelly", department: "support", address: { city: "Scranton" } },
         { age: 31, name: "Jim", department: "sales", address: { city: "Scranton" } },
-        { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } }, 
+        { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } },
         { age: 45, name: "Michael", department: "management" },
         { age: 46, name: "Toby", department: "hr" },
         { age: 45, name: "Phyllis", department: "sales" },
@@ -1011,38 +1011,38 @@ describe('Cursor', function () {
     });
 
     it("Updates properly", function(done) {
-      /* 
+      /*
        * We do things on the dataset, expecting certain results after updating the live query
        * We test removing, inserting, updating and if modifying an object we don't care about triggers live query update
        */
       var expected = [
         [ // Default results
-          { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } },         
+          { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } },
           { age: 31, name: "Jim", department: "sales", address: { city: "Scranton" } },
           { age: 45, name: "Phyllis", department: "sales" },
           { age: 23, name: "Ryan", department: "sales" },
         ], [ // Remove Jim
-          { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } }, 
+          { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } },
           { age: 45, name: "Phyllis", department: "sales" },
           { age: 23, name: "Ryan", department: "sales" },
         ], [ // Add Stanley
-          { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } }, 
+          { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } },
           { age: 45, name: "Phyllis", department: "sales" },
           { age: 23, name: "Ryan", department: "sales" },
           { name: "Stanley", age: 58, department: "sales" },
         ], [ // Update Phyllis
-          { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } }, 
+          { age: 33, name: "Dwight", department: "sales", address: { city: "Scranton" } },
           { age: 46, name: "Phyllis", department: "sales" },
           { age: 23, name: "Ryan", department: "sales" },
           { name: "Stanley", age: 58, department: "sales" },
         ]
       ];
-      
+
       var modifiers = [function() {
         d.remove({ name: "Jim" }, {}, _.noop);
       }, function() {
         d.save({ name: "Stanley", age: 58, department: "sales" }, _.noop);
-      }, function() { 
+      }, function() {
         d.update({ name: "Phyllis" }, { $inc: { age: 1 } }, {}, _.noop);
       }, function() { }];
 
@@ -1050,7 +1050,7 @@ describe('Cursor', function () {
       var query = d.find({ department: "sales" }).sort({ name: 1 }).live();
       d.on("liveQueryUpdate", function() {
         var exp = expected.shift(), mod = modifiers.shift();
-        
+
         //console.log(query.res.map(function(x){return x.name}), exp.map(function(x){return x.name}));
         assert.deepEqual(query.res.map(function(x) { return _.omit(x, "_id") }), exp);
         mod();
@@ -1063,7 +1063,7 @@ describe('Cursor', function () {
       done = _.once(done);
 
       var query = d.find({ department: "sales" }).sort({ name: 1 }).live();
-      
+
       var called = false;
       d.on("liveQueryUpdate", function() {
         if (called) return done(new Error("liveQueryUpdate called more than once"));
@@ -1073,13 +1073,13 @@ describe('Cursor', function () {
       });
 
       d.once("liveQueryUpdate", function() {
-        async.waterfall([function(cb) { 
+        async.waterfall([function(cb) {
           d.remove({name: "Kelly"},{},function(){cb()})
         }, function(cb) {
           d.update({ name: "Michael" }, { $inc: { age: 1 } }, { },function(){cb()});
-        }, function(cb) { 
+        }, function(cb) {
           d.insert({ name: "Plop", department: "service", age: 19 },function(){cb()});
-        }], function() { 
+        }], function() {
           setTimeout(function() { done() }, 300);
         });
       });
@@ -1089,10 +1089,10 @@ describe('Cursor', function () {
       done = _.once(done);
 
       var query = d.find({ department: "sales" }).sort({ name: 1 }).live();
-      
+
       d.once("liveQueryUpdate", function() {
         query.res.length.should.equal(4);
-        
+
         query.find({ department: "management" }).refresh();
         d.once("liveQueryUpdate", function() {
           query.res.length.should.equal(1);
@@ -1103,8 +1103,40 @@ describe('Cursor', function () {
 
     });
 
+    it("Live query can be stopped", function(done) {
+      done = _.once(done);
+
+      var query = d.find({ department: "sales" }).sort({ name: 1 })
+      query.should.not.to.have.ownProperty('refresh');
+      query.should.not.to.have.ownProperty('stop');
+      d.listeners('updated').should.to.have.length(0);
+      d.listeners('inserted').should.to.have.length(0);
+      d.listeners('removed').should.to.have.length(0);
+      d.listeners('reload').should.to.have.length(0);
+      d.listeners('liveQueryRefresh').should.to.have.length(0);
+
+      query.live();
+      query.should.to.have.ownProperty('refresh');
+      query.should.to.have.ownProperty('stop');
+      d.listeners('updated').should.to.have.length(1);
+      d.listeners('inserted').should.to.have.length(1);
+      d.listeners('removed').should.to.have.length(1);
+      d.listeners('reload').should.to.have.length(1);
+      d.listeners('liveQueryRefresh').should.to.have.length(1);
+
+      query.stop();
+      query.should.not.to.have.ownProperty('refresh');
+      query.should.not.to.have.ownProperty('stop');
+      d.listeners('updated').should.to.have.length(0);
+      d.listeners('inserted').should.to.have.length(0);
+      d.listeners('removed').should.to.have.length(0);
+      d.listeners('reload').should.to.have.length(0);
+      d.listeners('liveQueryRefresh').should.to.have.length(0);
+      done();
+    });
+
   }); // End of 'Live Query'
 
-}); 
+});
 
 
