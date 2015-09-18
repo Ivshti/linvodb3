@@ -38,14 +38,19 @@ module.exports = function setupSync(model, api, options)
         var baseQuery = { collection: options.remoteCollection || model.modelName };
         var remote = {}, push = [], pull = [];
 
+        var uid = api.user._id, checkUid = function() { return (api.user && api.user._id) == uid };
+
         async.auto({
             ensure_indexes: function(callback) { // Meaningless lookup to Ensure the DB has been indexed
+                if (! checkUid()) return callback(new Error("uid changed while syncing"));
                 model.count({ }, function(err, c) { 
                     callback();
                 }, true);
             },
             retrieve_remote: function(callback)
             {
+                if (! checkUid()) return callback(new Error("uid changed while syncing"));
+
                 api.request("datastoreMeta", baseQuery, function(err, meta)
                 { 
                     if (err) return callback(err);
@@ -56,6 +61,8 @@ module.exports = function setupSync(model, api, options)
             },
             compile_changes: ["ensure_indexes", "retrieve_remote", function(callback)
             {
+                if (! checkUid()) return callback(new Error("uid changed while syncing"));
+
                 var pushIds = [];
                 Object.keys(mtimes).forEach(function(id) {
                     var mtime = mtimes[id];
@@ -79,6 +86,8 @@ module.exports = function setupSync(model, api, options)
             }],
             push_remote: ["compile_changes", function(callback)
             {
+                if (! checkUid()) return callback(new Error("uid changed while syncing"));
+
                 if (push.length) status("pushing "+push.length+" changes to remote for "+model.modelName);
 
                 if (! push.length) return callback();
@@ -94,6 +103,8 @@ module.exports = function setupSync(model, api, options)
             }],
             pull_local: ["compile_changes", function(callback)
             {
+                if (! checkUid()) return callback(new Error("uid changed while syncing"));
+
                 if (! pull.length) return callback();
                 
                 api.request("datastoreGet", _.extend({ }, baseQuery, { ids: pull }), function(err, results)
@@ -106,6 +117,8 @@ module.exports = function setupSync(model, api, options)
                         x._ctime = new Date(x._ctime || 0);
                         x._mtime = new Date(x._mtime || 0);
                     });
+   
+                    if (! checkUid()) return callback(new Error("uid changed while syncing"));
 
                     model.save(results, function(err)
                     {
@@ -124,6 +137,9 @@ module.exports = function setupSync(model, api, options)
 
                 callback();
             }]
-        }, cb);
+        }, function(err) {
+            if (err) console.error(err);
+            cb();
+        });
     }, 1);
 }
