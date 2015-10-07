@@ -41,7 +41,7 @@ Install, Initialize, pick backend
 Install:
 ```javascript
 npm install linvodb3 medeadown # For NW.js, using Medea
-npm install leveldb3 leveldown # For pure node.js, using LevelDB
+npm install linvodb3 leveldown # For pure node.js, using LevelDB
 ```
 
 Initialize:
