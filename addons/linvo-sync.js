@@ -14,11 +14,11 @@ module.exports = function setupSync(model, api, options)
     };
 
     var dirty = false;
-    var triggerSync = function(cb)
+    var triggerSync = _.debounce(function(cb)
     { 
         dirty = true;
         q.push({}, cb);
-    };
+    }, options.debounce || 500);
     model.on("updated", function(items, quiet) { if (!quiet) triggerSync() });
     model.on("inserted", function(items, quiet) { if (!quiet) triggerSync() });
     model.static("triggerSync", triggerSync);
