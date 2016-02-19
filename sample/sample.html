@@ -17,7 +17,7 @@
 		<ul>
 			<li ng-repeat="task in tasks.res track by $id(task._id)">
 				<input type="checkbox" ng-model="task.completed" ng-click="task.save()">
-				{{::task.name}}
+				{{task.name}}
 			</li>
 		</ul>
 
@@ -26,7 +26,9 @@
 		<form ng-submit="selected.save()">
 			<span>Task name:</span>
 			<input ng-model="selected.name">
-			<input type="submit" value="{{ selected._id ? 'Add' : 'Save' }}">
+			<input type="submit" value="{{ selected._id ? 'Save' : 'Add' }}">
 		</form>
+
+		<button ng-click="newTask()">New task</button>
 	</body>
 </html>

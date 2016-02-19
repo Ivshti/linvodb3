@@ -19,9 +19,11 @@ var app = angular.module('todo', [])
 
 app.controller('todoList', ['$scope', function($scope) {
 	$scope.tasks = Task.find({ }).live()
-	$scope.incomplete = Task.find().filter(function(x) { return !x.completed }).count().live()
+	$scope.incomplete = Task.find({ completed: false }).count().live()
 
 	$scope.selected = new Task()
 
 	Task.on('liveQueryUpdate', function() { $scope.$digest() })
+
+	$scope.newTask = function() { $scope.selected = new Task() }
 }])
