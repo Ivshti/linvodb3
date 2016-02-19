@@ -10,6 +10,13 @@
 		<script src="sample.js"></script>
 	</head>
 	
-	<body>
+	<body ng-app>
+		<h1>TODOs</h1>
+
+		<ul>
+			<li ng-repeat="task in tasks.res track by $id(task._id)">
+				{{::task.name}}
+			</li>
+		</ul>
 	</body>
 </html>
