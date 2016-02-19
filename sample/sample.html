@@ -1,5 +1,5 @@
 
-<!doctype html>
+<!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="utf-8">
@@ -14,6 +14,7 @@
 		<h1>TODOs</h1>
 		<h2>incomplete: {{incomplete.res}}</h2>
 
+		<!-- List of all tasks -->
 		<ul>
 			<li ng-repeat="task in tasks.res track by $id(task._id)">
 				<input type="checkbox" ng-model="task.completed" ng-click="task.save()">
@@ -23,6 +24,7 @@
 
 		<hr>
 
+		<!-- Create/edit and save task -->
 		<form ng-submit="selected.save()">
 			<span>Task name:</span>
 			<input ng-model="selected.name">
