@@ -9,7 +9,7 @@ var Task = new linvodb('task', {
 	created: Date,
 	due: Date,
 	completed: Boolean
-});
+}, { });
 
 Task.on('construct', function(task) {
 	task.due = new Date(Date.now() + 24*60*60*1000)
@@ -19,7 +19,9 @@ var app = angular.module('todo', [])
 
 app.controller('todoList', ['$scope', function($scope) {
 	$scope.tasks = Task.find({ }).live()
-	$scope.incomplete = Task.find({ completed: false }).count().live()
+	$scope.incomplete = Task.find().filter(function(x) { return !x.completed }).count().live()
+
+	$scope.selected = new Task()
 
 	Task.on('liveQueryUpdate', function() { $scope.$digest() })
 }])
