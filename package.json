@@ -38,7 +38,9 @@
     "request": "2.9.x",
     "rimraf": "2.2.x",
     "sinon": "1.3.x",
-    "memdown": "^1.1.2"
+    "memdown": "^1.1.2",
+    "browserify": "13.x.x",
+    "level-js": "^2.2.3"
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec --timeout 10000"
