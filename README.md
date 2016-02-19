@@ -694,8 +694,6 @@ License
 See [License](LICENSE)
 
 
-Help / Donate
+Help
 -------------
-Pull requests are always welcome.
-
-LinvoDB is open source and free to use, but if you found it useful in your project you can donate to ensure the continued support for LinvoDB at this BTC address: 1HpJjJbrZ2RH9cZkJPdzqVndGEDrBK5Hat
+Pull requests are always welcome. :)
