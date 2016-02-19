@@ -10,8 +10,9 @@
 		<script src="sample.js"></script>
 	</head>
 	
-	<body ng-app>
+	<body ng-app="todo" ng-controller="todoList">
 		<h1>TODOs</h1>
+		<h2>incomplete: {{incomplete.res}}</h2>
 
 		<ul>
 			<li ng-repeat="task in tasks.res track by $id(task._id)">
