@@ -25,7 +25,7 @@
 		<hr>
 
 		<!-- Create/edit and save task -->
-		<form ng-submit="selected.save()">
+		<form ng-submit="selected.save(); newTask()">
 			<span>Task name:</span>
 			<input ng-model="selected.name">
 			<input type="submit" value="{{ selected._id ? 'Save' : 'Add' }}">
