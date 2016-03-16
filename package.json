@@ -29,8 +29,7 @@
     "hat": "0.0.3",
     "levelup": "^1.2.1",
     "lodash": "2.4.x",
-    "util": "^0.10.3",
-    "inherits": "Ivshti/inherits"
+    "util": "^0.10.3"
   },
   "devDependencies": {
     "chai": "1.0.x",
