@@ -29,6 +29,7 @@
     "hat": "0.0.3",
     "levelup": "^1.2.1",
     "lodash": "2.4.x",
+    "path": "^0.12.7",
     "util": "Ivshti/util"
   },
   "devDependencies": {
