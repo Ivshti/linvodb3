@@ -1,6 +1,6 @@
 {
   "name": "linvodb3",
-  "version": "3.15.0",
+  "version": "3.16.0",
   "author": {
     "name": "Ivo Georgiev",
     "email": "ivo@linvo.com"
@@ -28,8 +28,7 @@
     "binary-search-tree": "0.2.4",
     "hat": "0.0.3",
     "levelup": "^1.2.1",
-    "lodash": "2.4.x",
-    "randombytes": "^2.0.3"
+    "lodash": "2.4.x"
   },
   "devDependencies": {
     "chai": "1.0.x",
