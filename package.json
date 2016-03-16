@@ -27,7 +27,8 @@
     "bagpipe": "Ivshti/bagpipe",
     "binary-search-tree": "0.2.4",
     "levelup": "^1.2.1",
-    "lodash": "2.4.x"
+    "lodash": "2.4.x",
+    "randombytes": "^2.0.3"
   },
   "devDependencies": {
     "chai": "1.0.x",
