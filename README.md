@@ -7,7 +7,7 @@ LinvoDB is a Node.js/NW.js/Electron persistent DB with MongoDB / Mongoose-like f
 
 * **MongoDB-like query language**
 * **Persistence** built on LevelUP - you can **pick back-end**
-* **NW.js/Electron friendly** - JS-only backend is [Medea](https://github.com/medea/medea)
+* **NW.js/Electron friendly** - JS-only backend is [level-js](https://www.npmjs.com/package/level-js) or [Medea](https://github.com/medea/medea)
 * **Performant** - steady performance unaffected by DB size - queries are always indexed
 * **Auto-indexing**
 * **Live queries** - make the query, get constantly up-to-date results
@@ -28,7 +28,7 @@ In general:
 
 * LinvoDB is better for large datasets (many objects, or large objects) because it doesn't keep the whole DB in memory and doesn't need to always scan it
 * LinvoDB does the entire query through the indexes, NeDB scans the DB
-* Both LinvoDB and NeDB play well with NW.js (node-webkit). LinvoDB can be initialized with the JS-only MedeaDown back-end.
+* Both LinvoDB and NeDB play well with NW.js (node-webkit). LinvoDB can be initialized with the JS-only level-js back-end.
 * NeDB is ultra-fast because the DB is in memory, LinvoDB's performance is comparible to MongoDB. LinvoDB is faster for large datasets.
 * LinvoDB has live queries, map/reduce and schema support.
 * Both LinvoDB and NeDB are unsuitable for huge datasets (big data)
@@ -40,7 +40,7 @@ Install, Initialize, pick backend
 
 Install:
 ```javascript
-npm install linvodb3 medeadown # For NW.js, using Medea
+npm install linvodb3 level-js # For NW.js, using level-js
 npm install linvodb3 leveldown # For pure node.js, using LevelDB
 ```
 
@@ -49,8 +49,8 @@ Initialize:
 var LinvoDB = require("linvodb3");
 
 // The following two lines are very important
-// Initialize the default store to Medeadown - which is a JS-only store which will work without recompiling in NW.js / Electron
-LinvoDB.defaults.store = { db: require("medeadown") }; // Comment out to use LevelDB instead of Medea
+// Initialize the default store to level-js - which is a JS-only store which will work without recompiling in NW.js / Electron
+LinvoDB.defaults.store = { db: require("level-js") }; // Comment out to use LevelDB instead of level-js
 // Set dbPath - this should be done explicitly and will be the dir where each model's store is saved
 LinvoDB.dbPath = process.cwd(); 
 
@@ -64,7 +64,7 @@ var modelName = "doc";
 var schema = { }; // Non-strict always, can be left empty
 var options = { };
 // options.filename = "./test.db"; // Path to database - not necessary 
-// options.store = { db: require("medeadown") }; // Options passed to LevelUP constructor 
+// options.store = { db: require("level-js") }; // Options passed to LevelUP constructor 
 var Doc = new LinvoDB(modelName, schema, options); // New model; Doc is the constructor
 
 LinvoDB.dbPath // default path where data files are stored for each model
