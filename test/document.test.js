@@ -86,6 +86,20 @@ describe('Document', function () {
       c.test.getTime().should.equal(d.getTime());
     });
 
+
+    it('Can serialize and deserialize a RegExp', function () {
+      var a, b, c
+        , r = /test/i;
+
+      a = { test: r };
+      b = document.serialize(a);
+      c = document.deserialize(b);
+      b.indexOf('\n').should.equal(-1);
+      b.should.equal('{"test":{"$$regex":' + r.toString() + '}}');
+      util.isRegex(c.test).should.equal(true);
+      c.test.toString().should.equal(d.toString());
+    });
+
     it('Can serialize and deserialize sub objects', function () {
       var a, b, c
         , d = new Date();
