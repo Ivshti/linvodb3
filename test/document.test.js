@@ -95,9 +95,9 @@ describe('Document', function () {
       b = document.serialize(a);
       c = document.deserialize(b);
       b.indexOf('\n').should.equal(-1);
-      b.should.equal('{"test":{"$$regex":' + r.toString() + '}}');
-      util.isRegex(c.test).should.equal(true);
-      c.test.toString().should.equal(d.toString());
+      b.should.equal('{"test":{"$$regex":"' + r.toString() + '"}}');
+      (c.test instanceof RegExp).should.equal(true);
+      c.test.toString().should.equal(r.toString());
     });
 
     it('Can serialize and deserialize sub objects', function () {

@@ -41,7 +41,10 @@ describe('Database', function () {
           return cb();
         });
       }
-    ], done);
+    ], function(err) {
+      if (err) console.error(err);
+      done();
+    });
   });
 
   /*
