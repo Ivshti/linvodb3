@@ -1,6 +1,6 @@
 var async = require("async"),
     fs = require("fs"),
-    _ = require("lodash");
+    _ = require("underscore");
 
 module.exports = function setupSync(model, api, options)
 {
