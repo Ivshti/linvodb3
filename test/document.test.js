@@ -1,7 +1,7 @@
 var document = require('../lib/document')
   , should = require('chai').should()
   , assert = require('chai').assert
-  , _ = require('lodash/dist/lodash.underscore')
+  , _ = require('underscore')
   , async = require('async')
   , util = require('util')
   , fs = require('fs')

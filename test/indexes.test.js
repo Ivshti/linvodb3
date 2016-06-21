@@ -1,7 +1,7 @@
 var Index = require('../lib/indexes')
   , should = require('chai').should()
   , assert = require('chai').assert
-  , _ = require('lodash/dist/lodash.underscore')
+  , _ = require('underscore')
   , async = require('async')
   , model = require('../lib/document')
   ;

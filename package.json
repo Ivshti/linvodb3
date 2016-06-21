@@ -1,6 +1,6 @@
 {
   "name": "linvodb3",
-  "version": "3.19.0",
+  "version": "3.20.0",
   "author": {
     "name": "Ivo Georgiev",
     "email": "ivo@linvo.com"
@@ -28,7 +28,7 @@
     "binary-search-tree": "0.2.6",
     "hat": "0.0.3",
     "levelup": "^1.2.1",
-    "lodash": "2.4.x",
+    "underscore": "1.8.x",
     "path": "^0.12.7",
     "util": "Ivshti/node-util"
   },
