@@ -40,6 +40,8 @@ module.exports = function setupSync(model, api, options)
 
         var uid = api.user._id, checkUid = function() { return (api.user && api.user._id) == uid };
 
+        status("sync started for "+model.modelName);
+
         async.auto({
             ensure_indexes: function(callback) { // Meaningless lookup to Ensure the DB has been indexed
                 if (! checkUid()) return callback(new Error("uid changed while syncing"));
