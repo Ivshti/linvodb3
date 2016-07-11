@@ -124,7 +124,7 @@ module.exports = function setupSync(model, api, options)
                         x._ctime = new Date(x._ctime || 0);
                         x._mtime = new Date(x._mtime || 0);
                         return x;
-                    });
+                    }).filter(function(x) { return x });
    
                     if (! checkUid()) return callback(new Error("uid changed while syncing"));
 
