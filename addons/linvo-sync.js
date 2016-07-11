@@ -108,6 +108,8 @@ module.exports = function setupSync(model, api, options)
                 if (! checkUid()) return callback(new Error("uid changed while syncing"));
 
                 if (! pull.length) return callback();
+
+                if (options.limitPerSync) pull = pull.slice(0, options.limitPerSync);
                 
                 api.request("datastoreGet", _.extend({ }, baseQuery, { ids: pull }), function(err, results)
                 {
