@@ -115,13 +115,15 @@ module.exports = function setupSync(model, api, options)
                 {
                     if (err) return callback(err);
 
-                    results = _.uniq(results, "_id");
-
                     if (results.length) status("pulled "+results.length+" down for "+model.modelName);
 
-                    results.forEach(function(x) {
+                    var byId = { };
+                    results = results.map(function(x) {
+                        if (byId[x._id]) return;
+                        byId[x._id] = true;
                         x._ctime = new Date(x._ctime || 0);
                         x._mtime = new Date(x._mtime || 0);
+                        return x;
                     });
    
                     if (! checkUid()) return callback(new Error("uid changed while syncing"));
