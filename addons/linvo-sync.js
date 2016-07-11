@@ -115,6 +115,8 @@ module.exports = function setupSync(model, api, options)
                 {
                     if (err) return callback(err);
 
+                    results = _.uniq(results, "_id");
+
                     if (results.length) status("pulled "+results.length+" down for "+model.modelName);
 
                     results.forEach(function(x) {
