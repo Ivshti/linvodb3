@@ -410,38 +410,47 @@ describe('Database', function () {
     describe('Events', function () {
       describe('construct', function () {
         it('Emits the construct event when a doc is constructed', function (done) {
+          var constructed = false;
           d.on('construct', function (doc) {
-            doc.a.should.equal(1);         
-            done();
+            doc.a.should.equal(1);
+            constructed = true;
           });
           d.insert({ a: 1 }, function (err, doc) {
             if (err) throw err;
+            assert.isTrue(constructed, "doc was constructed");
+            done();
           });
         });
       });
 
       describe('when a document is inserted', function () {
         it('Emits the inserted event with the inserted doc', function (done) {
+          var inserted = false;
           d.on('inserted', function (docs) {
             remove_ids(docs);
-            docs.should.eql([{ a: 1 }]);            
-            done();
+            docs.should.eql([{ a: 1 }]); 
+            inserted = true;    
           });
           d.insert({ a: 1 }, function (err, doc) {
             if (err) throw err;
+            assert.isTrue(inserted, "doc was inserted");
+            done();
           });
         });
       });
 
       describe('when multiple documents are inserted', function () {
         it('Emits the inserted event with the inserted docs', function (done) {
+          var inserted = false;
           d.on('inserted', function (docs) {
             remove_ids(docs);
             _.sortBy(docs, 'a').should.eql([{ a: 1 }, { a: 2 }]);
-            done();
+            inserted = true;
           });
           d.insert([{ a: 1 }, { a: 2}], function (err, doc) {
             if (err) throw err;
+            assert.isTrue(inserted);
+            done();
           });
         });
       });
