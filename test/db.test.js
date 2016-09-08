@@ -478,6 +478,7 @@ describe('Database', function () {
 
   describe('#getIdsForQuery', function () {
     var getCandidates = function(query, sort, cb) {
+      cb = _.once(cb)
       var stream = Cursor.getMatchesStream(d, query, sort);
       stream.on("ids", function(ids) {
         stream.close();
