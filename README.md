@@ -682,6 +682,36 @@ You can remove a previously created index with `Doc.removeIndex(fieldName, cb)`.
 **NOTE compound indexes are currently not supported.**
 
 
+Promises with Bluebird
+----------
+Even though LinvoDB does not support Promises out-of-the-box, it can easily be
+made promise-friendly using [Bluebird's promisification feature](http://bluebirdjs.com/docs/api/promisification.html):
+
+
+```javascript
+
+var LinvoDB = require("linvodb3");
+var Promise = require("bluebird");
+Promise.promisifyAll(LinvoDB);
+// As of this line, LinvoDB APIs now have promise-returning methods with *Async suffix.
+// All the callback-based APIs are still there and will work as before.
+
+Planet.findAync({ system: 'solar' }).then(function(docs) {
+	// use docs somehow
+}).catch(function(err) {
+	// handle errors
+});
+
+// or, if you use ES7 async / await:
+
+try {
+	var docs = Planet.findAync({ system: 'solar' });
+	// use docs somehow
+} catch (err) {
+	// handle errors
+}
+```
+
 
 Utilization
 -------------
