@@ -705,7 +705,7 @@ Planet.findAync({ system: 'solar' }).then(function(docs) {
 // or, if you use ES7 async / await:
 
 try {
-	var docs = Planet.findAync({ system: 'solar' });
+	var docs = await Planet.findAync({ system: 'solar' });
 	// use docs somehow
 } catch (err) {
 	// handle errors
