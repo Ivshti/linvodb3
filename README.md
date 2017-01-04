@@ -696,7 +696,7 @@ Promise.promisifyAll(LinvoDB);
 // As of this line, LinvoDB APIs now have promise-returning methods with *Async suffix.
 // All the callback-based APIs are still there and will work as before.
 
-Planet.findAync({ system: 'solar' }).then(function(docs) {
+Planet.findAsync({ system: 'solar' }).then(function(docs) {
 	// use docs somehow
 }).catch(function(err) {
 	// handle errors
@@ -705,7 +705,7 @@ Planet.findAync({ system: 'solar' }).then(function(docs) {
 // or, if you use ES7 async / await:
 
 try {
-	var docs = await Planet.findAync({ system: 'solar' });
+	var docs = await Planet.findAsync({ system: 'solar' });
 	// use docs somehow
 } catch (err) {
 	// handle errors
