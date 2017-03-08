@@ -1135,6 +1135,26 @@ describe('Cursor', function () {
       done();
     });
 
+    it('Can have many live queries in one model', function (done) {
+      done = _.once(done);
+
+      var liveFind, liveCount;
+
+      // comment one of these two to work
+      liveFind = d.find({}).live();
+      liveCount = d.find({}).count().live();
+
+      d.on("liveQueryUpdate", function() {
+        if (liveFind)
+          liveFind.res.length.should.equal(7);
+
+        if (liveCount)
+          liveCount.res.should.equal(7);
+
+        done();
+      });
+    });
+
   }); // End of 'Live Query'
 
 });
