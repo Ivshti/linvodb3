@@ -692,11 +692,14 @@ made promise-friendly using [Bluebird's promisification feature](http://bluebird
 
 var LinvoDB = require("linvodb3");
 var Promise = require("bluebird");
-Promise.promisifyAll(LinvoDB);
+
+var Planet = new LinvoDB('planet', {});
+
+Promise.promisifyAll(Planet.find().__proto__);
 // As of this line, LinvoDB APIs now have promise-returning methods with *Async suffix.
 // All the callback-based APIs are still there and will work as before.
 
-Planet.findAsync({ system: 'solar' }).then(function(docs) {
+Planet.find({ system: 'solar' }).limit(10).execAsync().then(function(docs) {
 	// use docs somehow
 }).catch(function(err) {
 	// handle errors
@@ -705,7 +708,7 @@ Planet.findAsync({ system: 'solar' }).then(function(docs) {
 // or, if you use ES7 async / await:
 
 try {
-	var docs = await Planet.findAsync({ system: 'solar' });
+	var docs = await Planet.find({ system: 'solar' }).limit(10).execAsync();
 	// use docs somehow
 } catch (err) {
 	// handle errors
