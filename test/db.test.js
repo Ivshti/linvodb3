@@ -103,6 +103,7 @@ describe('Database', function () {
             Object.keys(docs[0]).length.should.equal(2);
             docs[0].somedata.should.equal('ok');
             assert.isDefined(docs[0]._id);
+            docs[0]._id.should.have.lengthOf(16);
 
             // After a reload the data has been correctly persisted
             d.reload(function (err) {
@@ -112,6 +113,7 @@ describe('Database', function () {
                 Object.keys(docs[0]).length.should.equal(2);
                 docs[0].somedata.should.equal('ok');
                 assert.isDefined(docs[0]._id);
+                docs[0]._id.should.have.lengthOf(16);
 
                 done();
               });
