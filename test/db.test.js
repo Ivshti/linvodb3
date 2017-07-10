@@ -611,7 +611,7 @@ describe('Database', function () {
         { tf: 5, r: 6 },        
         { tf: 10, r: 10 },
       ], function (err, docs) {
-        doc = docs;
+        doc = docs[0];
         getCandidates({ r: { $exists: true, $lt: 5 } }, null, function(data) {
             data.length.should.equal(1);
             assert.deepEqual(doc, data[0]);
