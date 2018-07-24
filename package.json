@@ -26,6 +26,7 @@
     "async": "2.x.x",
     "bagpipe": "Ivshti/bagpipe#ae11730ef59364b20868287fb3ce0970a87dc8c8",
     "binary-search-tree": "0.2.6",
+    "encoding-down": "5.0.4",
     "hat": "0.0.3",
     "levelup": "^2.0.1",
     "underscore": "1.8.x",
