@@ -1,6 +1,10 @@
 {
   "name": "linvodb3",
+<<<<<<< HEAD
   "version": "3.25.3",
+=======
+  "version": "3.25.2",
+>>>>>>> 48d533b58e0ded6111daf74ae17ad53de624f13a
   "author": {
     "name": "Ivo Georgiev",
     "email": "ivo@linvo.com"
@@ -26,25 +30,29 @@
     "async": "2.x.x",
     "bagpipe": "Ivshti/bagpipe#ae11730ef59364b20868287fb3ce0970a87dc8c8",
     "binary-search-tree": "0.2.6",
+<<<<<<< HEAD
     "encoding-down": "5.0.4",
+=======
+    "encoding-down": "^5.0.4",
+>>>>>>> 48d533b58e0ded6111daf74ae17ad53de624f13a
     "hat": "0.0.3",
-    "levelup": "^2.0.1",
-    "underscore": "1.8.x",
+    "levelup": "^3.1.1",
     "path": "^0.12.7",
+    "underscore": "1.8.x",
     "util": "Ivshti/node-util"
   },
   "devDependencies": {
+    "browserify": "14.x.x",
     "chai": "4.1.x",
     "commander": "2.12.1",
     "exec-time": "0.0.4",
+    "level-js": "^2.2.3",
     "leveldown": "^2.0.2",
+    "memdown": "^1.1.2",
     "mocha": "4.0.x",
     "request": "2.83.x",
     "rimraf": "2.6.x",
-    "sinon": "4.1.x",
-    "memdown": "^1.1.2",
-    "browserify": "14.x.x",
-    "level-js": "^2.2.3"
+    "sinon": "4.1.x"
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec --timeout 10000"
