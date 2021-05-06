@@ -30,7 +30,7 @@
     "hat": "0.0.3",
     "levelup": "^3.1.1",
     "path": "^0.12.7",
-    "underscore": "1.8.x",
+    "underscore": "1.12.x",
     "util": "Ivshti/node-util"
   },
   "devDependencies": {
