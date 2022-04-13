@@ -23,7 +23,7 @@
     "url": "git@github.com:Ivshti/linvodb3.git"
   },
   "dependencies": {
-    "async": "2.x.x",
+    "async": "3.x.x",
     "bagpipe": "Ivshti/bagpipe#ae11730ef59364b20868287fb3ce0970a87dc8c8",
     "binary-search-tree": "0.2.6",
     "encoding-down": "^5.0.4",
