@@ -42,7 +42,7 @@
     "leveldown": "^2.0.2",
     "memdown": "^1.1.2",
     "mocha": "4.0.x",
-    "request": "2.83.x",
+    "request": "2.88.x",
     "rimraf": "2.6.x",
     "sinon": "4.1.x"
   },
